@@ -2,25 +2,32 @@ function [coef,CoefDist,NodCorr] = cut_solv(tin,uin,vin,lat,cnstit,varargin)
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2019/09 - 2020/12 
 % Adapted from UT_SOLV() - UTide v1p0 2011/09, http://www.po.gso.uri.edu/~codiga/utide/utide.htm. 
 % 
-% TO DO: 
+% TO DO (warning messages have been set up for most of these issues): 
 % - complete the help with a complete description of the options;
-% - complete the comments in the sub-function scripts.
+% - complete the comments in the sub-function scripts;
+% - test models with inferred constituents for modified models; 
 % - test the 2D analysis and the experimental options for regression (e.g., ridge estimator, elastic net, etc)
-% 
+% - summarize the user-defined option parsing;
+%
 % cut_solve.m and cut_reconstr.m execute harmonic tidal analysis using a 
 % modified version of UTide. Major modifications to UTide consist in:
 %
 % - Allowing to solve the HA based on a non-complex formulation of the regression model 
-% [i.e. as in Foreman and Henry, 1989, and Innocenti et al., submitted to JTECH]
+%   for 1D analyses [i.e. as in Foreman and Henry, 1989, and Innocenti et al., 
+%   submitted to JTECH].
 %
 % - Adding some useful output for 1D analyses [e.g., return some statistics
-% for uncertainty assessments in the CoefDist structure]. 
-% NOT ALL these quantities have been added (yet) to the 2D-analysis output.
+%   for uncertainty assessments in the CoefDist and coef.aux structures]. 
+%   NOT ALL these quantities have been added (yet) to the 2D-analysis output.
 %
-% - Separating ut_solv.m in various subfunctions/scripts to improve the code readability.
+% - Allowing to use ridge, lasso, or elastic-net estimators for the HA regerssion. 
+% NOTE: these code options have not been thoroughly tested (use at your own risk) 
+% but the code includes many warnings related to the use of these estimators.
+% - Separating ut_solv.m in various subfunctions/scripts and add comments  
+%   to improve the code readability.
 %
 %
-% OVERVIEW : 
+% OVERVIEW: 
 % cut_solve.m defines the analysis setup and executes the leat-square optimization 
 % of the regression model. Various statistics intended for model selection and residual 
 % analysis are also computed. Specific analysis steps consist in:

@@ -2,7 +2,7 @@ function [u,v] = cut_reconstr(tin,coef,varargin)
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2019/09 - 2020/12
 % Adapted from ut_reconstr() - UTide v1p0 2011/09, http://www.po.gso.uri.edu/~codiga/utide/utide.htm. 
 % 
-% TO DO:
+% TO DO (warning messages have been set up for most of these issues):
 % - complete the help with a complete description of the options;
 % - complete the comments in the sub-function scripts.
 %
