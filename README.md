@@ -21,11 +21,13 @@ Execute tidal HA using a modified version of UTide.
 
 Major modifications to UTide consist in:
 * Allowing to solve the HA based on a non-complex formulation of the regression model 
-[i.e. as in Foreman and Henry, 1989, and Innoncenti et al., submitted to JTECH].
-*  Adding some useful output for 1D analyses [e.g., return some statistics for uncertainty assessments in the CoefDist structure]. NOTE: not all these quantities have been added (yet) to the 2D-analysis output.
-* Separating *_ut_solv.m_* in various scripts to improve readability of subfuctions.
+in 1D analyses [i.e. as in Foreman and Henry, 1989, and Innocenti et al., submitted to JTECH].
+*  Adding some useful output for 1D analyses [e.g., return some statistics for uncertainty assessments in the CoefDist and coef.aux structures]. **NOTE:** not all these quantities have been added (yet) to the 2D-analysis output.
+* Allowing to use ridge, lasso, or elastic-net estimators for the HA regerssion. 
+**NOTE:** these code options have not been thoroughly tested (use at your own risk) but the code includes many warnings related to the use of these estimators.
+* Separating *_ut_solv.m_* in various scripts and add comments to improve readability of subfuctions. 
 
-Note that `cut_solv.m` and  `cut_reconstr.m` are intended to work with bi-dimentional data (current series) but they haven't been tested in this use. 
+**NOTE:** `cut_solv.m` and  `cut_reconstr.m` are intended to work with bi-dimentional data (current series) but they haven't been tested in this use. 
 
 ---- 
 Foreman and Henry, 1989 - DOI:10.1016/0309-1708(89)90017-1
