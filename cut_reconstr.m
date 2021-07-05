@@ -1,95 +1,67 @@
 function [u,v] = cut_reconstr(tin,coef,varargin)
-% S. Innocenti Adapted from ut_reconstr() for reeconstructing superposed harmonics
-% 2019/10
-%
-% Generates hindcast and/or forecast/prediction at user-specified times
-% using output from companion harmonic analysis function UT_SOLV().
+% S. Innocenti, silvia.innocenti@ec.gc.ca, 2019/09 - 2020/12
+% Adapted from ut_reconstr() - UTide v1p0 2011/09, http://www.po.gso.uri.edu/~codiga/utide/utide.htm. 
 % 
+% TO DO:
+% - complete the help with a complete description of the options;
+% - complete the comments in the sub-function scripts.
+%
+% OVERVIEW:
+% cut_reconstr.m generates hindcasts and/or forecasts/predictions at 
+% user-specified times using the HA coefficient structure computed by CUT_SOLV(). 
+% Specific steps of the reconstruction are:
+% - select a list (e.g., a subset) of constituents from those estimated by 
+%   cut_solv.m and compute the corresponding model basis function 
+% - reconstruct the regression prediction based the selected list of constituents
+
 % Syntax for two-dimensional raw input, such as velocities:
-%   [ u_fit, v_fit ] = UR_RECONSTR ( t_fit, coef , {options} );
-% 
-% Syntax for one-dimensional raw input, such as sea level:
-%   [ sl_fit, ~ ] = cut_reconstr ( t_fit, coef , {options} ); 
+%     [ u_fit, v_fit ] = UR_RECONSTR ( t_fit, coef , {options} );
 %
-%   Analysis of groups of records
-%   The descriptions that follow next for INPUTS, DEFAULTS, OPTIONS, and 
-%   OUTPUTS are for treatment of a single record. Following that, 
-%   explanations are given for modifications that enable treating a group 
-%   of records with a single execution.
-% 
+% Syntax for one-dimensional raw input, such as sea level:
+%     [ sl_fit, ~ ] = cut_reconstr ( t_fit, coef , {options} ); 
+%
+%     Analysis of groups of records (TO BE TESTED)
+% The description below considers INPUTS, DEFAULTS, OPTIONS, and OUTPUT for treating a single record analysis. Modifications for treating a group of records with a single execution are given in Codiga (2011) and UTide help. 
+%
 % INPUT: 
-%   * t_fit = Column vector of arbitrary times [datenum UCT/GMT] distributed
-%             uniformly or irregularly. Hindcast are produced at these time steps.
-%             If t_fit include NaNs, the outputs (u_fit/v_fit or sl_fit) will put 
-%             NaNs at the corresponding time steps. 
-%   * coef  = results output structure from CUT_SOLV()
-%   * u_fit & v_fit, or sl_fit = reconstructed superposed harmonics
+%     * t_fit = Column vector of arbitrary times [datenum UCT/GMT] distributed uniformly or irregularly. Hindcasts are produced at these time steps. If t_fit include NaNs, the outputs (u_fit/v_fit or sl_fit) will put NaNs at the corresponding time steps. 
+%     * coef  = results output structure from CUT_SOLV()
+%     * u_fit & v_fit, or sl_fit = reconstructed superposed harmonics
 %
 % {OPTIONS} 
-%
 % OUTPUT:
-%   * t_fit    = arbitrary times for reconstructed superposed harmonics
-%   * u_fit & v_fit, or sl_fit = reconstructed superposed harmonics
+%     * t_fit    = Tx1 vector of times [datenum UTC] defining the dates at whcih hindcasts must be produced 
+%     * u_fit & v_fit, or sl_fit =  Tx1 vectors of reconstructed superposed harmonics 
 %
-% DEFAULTS
 %
-%   * Constituents with SNR > 2 are included in the superposition. 
-%   * All other aspects of the calculation are determined by the 
-%       information in coef, such that they match the calculation done 
-%       by UT_SOLV(); to change them another run of UT_SOLV() is needed.
+% OPTIONS:
+% Option flags are not case-sensitive but cannot be abbreviated. The option order is not relevant. Please refer to ut_solv.m help and Codiga (2011) 
+% for complete explanations of UTide options. 
+%     * â€˜MinSNRâ€™, MinSNR (num) to select constituents with SNR >= MinSNR. Default MinSNR=2.
+%     * â€˜MinPEâ€™, MinPE (num) to select constituents with PE > MinPE. Default MinPE=0. 
+%     If both â€˜MinSNRâ€™ and â€˜MinPEâ€™ are specified, no constituent with either 
+%     SNR or PE values lower than the defined thresholds will be used.
+%     * â€˜Cnstitâ€™, Cnstit (cell list of 4-character strings) define a list of 
+%       constituents, which must be used for regerssion hindcasts. The list of 
+%       names must include all or a subset of constituents in the coef.name 
+%       field of the  cut_solv() output structure. If â€˜Cnstitâ€™ is specified, the 
+%       MinSNR and MinPE options are ignored.
 %
-% OPTIONS
+% DEFAULTS: 
+%     * Constituents with SNR > 2 are included in the superposition. 
+%     * All options used for the HA regression are read from the coef structure, output of cut_solv().
 %
-% Option flags are not case-sensitive but cannot be abbreviated. The order
-% of the option flags is not important but they must be passed in 
-% after all other arguments. See report for more complete explanations.
-%
-%   ‘MinSNR’, MinSNR 
-%
-%       * Only include constituents with SNR >= MinSNR. Default MinSNR=2.
-%
-%   ‘MinPE’, MinPE 
-%
-%       * Only include constituents with PE > MinPE. Default MinPE=0. 
-%
-% If both of ‘MinSNR’ and ‘MinPE’ are selected no constituent with either 
-%   SNR or PE values lower than the specified thresholds will be included.
-%
-%   ‘Cnstit’, Cnstit
-%
-%       * Include only those constituents named in Cnstit, which must be 
-%           selected from those in coef.name.
-%               Cnstit = cell array of 4-character strings.
-%       * If ‘Cnstit’ is used then MinSNR and MinPE are ignored.
-% 
-% OUTPUTS
-%
+% OUTPUTS:
 % u_fit & v_fit, or sl_fit
 %
-%   * Column vector(s) (same size as t_fit) containing the superposed
-%       harmonics and the mean (and trend if included in model).
+%     * Tx1 column vector(s) (same size as t_fit) containing the superposed
+%         harmonics and the mean (and trend if included in the model).
 %
-% GROUPS OF RECORDS
+% GROUPS OF RECORDS (TEMPORARILY ELIMINATED)
 %
-% Inputs are as in the single-record case except that t_fit can be either
-%   a single n_t x 1 vector of times, to be used for all time sequences
-%   in the group, or an n_t x n1 x n2 x n3 ... n-n_d array of times, which
-%   specifies a different set of n_t times for each record. See comments
-%   for UT_SOLV() for explanations of the parameters n1, n2, ..., n-n_d.
-%
-% Output is the same as in the single-record case except that u_fit & 
-%   v_fit, or sl_fit, are n_t x n1 x n2 x n3 ... n-n_d arrays (the same 
-%   size as the u_raw & v_raw, or sl_raw, inputs to the UT_SOLV() run
-%   that created coef). 
-%
-% For more information see:
-%   Codiga, D.L., 2011. Unified Tidal Analysis and Prediction Using the 
-%       UTide Matlab Functions. Technical Report 2011-01. Graduate School 
-%       of Oceanography, University of Rhode Island, Narragansett, RI. 
-%       59pp. ftp://www.po.gso.uri.edu/pub/downloads/codiga/pubs/
-%       2011Codiga-UTide-Report.pdf
-%
-% UTide v1p0 9/2011 d.codiga@gso.uri.edu
+% REFERENCES:
+% Codiga, 2011 - http://www.po.gso.uri.edu/~codiga/utide/utide.htm
+
 
 
 if isequal(size(coef.g,2),1) % single record 

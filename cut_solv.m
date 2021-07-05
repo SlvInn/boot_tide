@@ -1,40 +1,54 @@
 function [coef,CoefDist,NodCorr] = cut_solv(tin,uin,vin,lat,cnstit,varargin)
-% S. Innocenti adapted from UT_SOLV(). UTide v1p0 9/2011 d.codiga@gso.uri.edu 
-% 2019/09
+% S. Innocenti, silvia.innocenti@ec.gc.ca, 2019/09 - 2020/12 
+% Adapted from UT_SOLV() - UTide v1p0 2011/09, http://www.po.gso.uri.edu/~codiga/utide/utide.htm. 
 % 
-% Execute harmonic tidal analysis using a modified version of UTide. 
-% Major modifications conisist in:
+% TO DO: 
+% - complete the help with a complete description of the options;
+% - complete the comments in the sub-function scripts.
+% - test the 2D analysis and the experimental options for regression (e.g., ridge estimator, elastic net, etc)
+% 
+% cut_solve.m and cut_reconstr.m execute harmonic tidal analysis using a 
+% modified version of UTide. Major modifications to UTide consist in:
 %
-% - Allowing to solve the HA based on a non complex formulation of the regression model 
-% [i.e. as in Foreman and Henry, 1989, and Innoncenti et al., submitted to JTECH]
+% - Allowing to solve the HA based on a non-complex formulation of the regression model 
+% [i.e. as in Foreman and Henry, 1989, and Innocenti et al., submitted to JTECH]
 %
-% - Adding some useful output for 1D-analyses [e.g., return some statistics
+% - Adding some useful output for 1D analyses [e.g., return some statistics
 % for uncertainty assessments in the CoefDist structure]. 
 % NOT ALL these quantities have been added (yet) to the 2D-analysis output.
 %
-% - Separating ut_solv.m in various scripts to improve readability of subfuctions.
+% - Separating ut_solv.m in various subfunctions/scripts to improve the code readability.
 %
 %
-% OVERVIEW 
+% OVERVIEW : 
+% cut_solve.m defines the analysis setup and executes the leat-square optimization 
+% of the regression model. Various statistics intended for model selection and residual 
+% analysis are also computed. Specific analysis steps consist in:
+% - choice of the estimated and inferred constituents;  
+% - regression model definition (e.g., trend/no-trend, use nodal corrections, 
+%   calculation of the design matrix / model basis at the specified frequencies, etc);
+% - choice of the regression estimator (e.g., ols vs irls, irls parameters, etc) 
+%   and least square optimization; 
+% - computation of basic statistics for model evaluation, further constituent 
+%   selection, and residual analysis (e.g., CoefDist output structure).
 % 
 % Syntax for two-dimensional raw input, such as velocities:
 % 	coef = cut_solv ( tin, uin, vin, lat, cnstit , {options} ); 
 % 
 % Syntax for one-dimensional raw input, such as sea level:
 % 	coef = cut_solv ( tin, uin,  [], lat, cnstit , {options} ); 
-% 
-% Analysis of groups of records
-%   The descriptions that follow next for INPUTS, DEFAULTS, OPTIONS, and 
-%   OUTPUT are for treatment of a single record. Following that, 
-%   explanations are given for modifications that enable treating a group 
-%   of records with a single execution.
+%
+% Analysis of groups of records (TO BE TESTED)
+% The description below considers INPUTS, DEFAULTS, OPTIONS, and OUTPUT 
+% for treating a single record analysis.  Modifications for treating a group 
+% of records with a single execution are given in Codiga (2011) and UTide help. 
 %
 % INPUT : 
 %   * tin      = (ntin x 1) vector of raw times [datenum UTC] passed in to ut_solv 
-%   * uin, vin = (ntin x 1) vecotrs of raw input values [units arb.] passed in to ut_solv 
+%   * uin, vin = (ntin x 1) vectors of raw input values [units arb.] passed in to ut_solv 
 %   * lat      = latitude (required for use in default nod./sat. corrections)
 %   * cnstit   = specification of constituents to include in model: 
-%                (nc x 1) cell array of 4-char strings passed in to ut_solv 
+%                (nc x 1) cell array of 4-char strings passed to ut_solv 
 %
 % OUTPUT:
 %     nt = number of t/u/v values ( b/c of nans, can be < length(tin) )
@@ -48,18 +62,17 @@ function [coef,CoefDist,NodCorr] = cut_solv(tin,uin,vin,lat,cnstit,varargin)
 %   uvgd = result of ~isnan(uin) & tgd [ & ~isnan(vin) ] (ntin x 1)
 %
 % OPTIONS:
-% Option flags are not case-sensitive but cannot be abbreviated. The order
-% of the option flags is not important but they must be passed in 
-% after all other arguments. See report for more complete explanations.
-% See ut_solv.m and Codiga (2011) for UTide options. 
+% Option flags are not case-sensitive but cannot be abbreviated. The option  
+% order is not relevant. Please refer to ut_solv.m help and Codiga (2011) 
+% for complete explanations of UTide options. 
 %
-% New optional input (not in UTide)are:
+% New optional input (not in UTide) are:
 %
-%   * 'sincosf' - string that impose the use of the sin/cos formulation of
+%   * 'sincosf' - string that imposes the use of the sin/cos formulation of
 %               the HA regression model. Default: non-specified (ie. use
 %               the complex formulation)
-%   * few experimantal additional optios are explained directly in the code
-%      but not officially presented here
+%   * few additional options are explained directly in the code
+%      but not officially presented here since they are still experimental
 %    
 %
 % OUTPUT
@@ -67,16 +80,17 @@ function [coef,CoefDist,NodCorr] = cut_solv(tin,uin,vin,lat,cnstit,varargin)
 %   * coef = results structure from cut_solv()
 %
 % NEW OUTPUT (compared to ut_solv.m):
-%   * coef.Std  - structure in coef containing the vectors of the standard error 
-%             estimated for each parameter >> See cut_ci
+%   * coef.Std  - structure containing the vectors of the standard error 
+%             estimated for each parameter >> See cut_ci.m help.
 %
 %   * CoefDist  - structure containing the var-cov estimates and MC simulations
 %       and the Monte-Carlo simulations for complex parameters, as well as for
-%       the amplitudes and phases >> See cut_ci
+%       the amplitudes and phases >> See cut_ci.m help
 %
 %
+% REFERENCES:
 % Foreman and Henry, 1989 - DOI:10.1016/0309-1708(89)90017-1
-%
+% Codiga, 2011 - http://www.po.gso.uri.edu/~codiga/utide/utide.htm
 %
 
 if isequal(sum(size(uin)>2),1)  % single record
