@@ -14,7 +14,7 @@ function [coef_boot,B] = cut_boot1(tin,uin,vin,coef,n_boot,varargin)
 % heritate estimation options
 opt = coef.aux.opt;
 
-% reconstrauct series 
+% reconstruct the original series based on the estiamted parameters (i.e. regression fit)
 [uhat,vhat] = cut_reconstr1(tin,coef,'cnstit',coef.name);
 
 % check series dimension
@@ -152,7 +152,7 @@ if strcmpi(bopt.mtd,'mbb')
     lBlkrand = cut_boot_blk_lengt(bopt)
     
    
-   % extract random starts of the blocks
+   % simulate/draw random starts of the blocks
     rng(bopt.seed(1))
     I0rand = randi([1 ltin], expNbl,n_boot);
     
@@ -173,59 +173,55 @@ if strcmpi(bopt.mtd,'mbb')
        Ycirc = Yres;
    end
     
-   % resamples
+   % construct resamples
      for bs = 1 : n_boot
-         
-        Tbs = [];
-       iTbs = [];
-     lBlkbs = [];
-         bl = 0;
-         
-        % print the iteration steps 
-        %if mod(bs,10^3)==0
-        %   disp([' ' num2str(bs) 'th boot iteration - ' datestr(now)])
-        %end
 
+        % construct a series of obs indices to select data in the resamples
+         
+        % empties for the bs-th resample
+        Tbs = []; % series  of the resampled dates  
+       iTbs = []; % indices of the resampled dates  
+     lBlkbs = []; % lengths of each resampled block
+         bl = 0;  % block counter
 
-        while numel(Tbs)< ltin
-            bl = bl+1;
+        while numel(Tbs)< ltin 
+            bl = bl+1; % increase the block counter
                    
-            i0 = I0rand(bl,bs);  % random start of block
-        lBlk = lBlkrand(bl,bs);
+            i0 = I0rand(bl,bs);  % random start of the bl-th block
+        lBlk = lBlkrand(bl,bs);  % length of the bl-th block
 
-             tE = (tin(i0).*24+lBlk)./24;
-             iE = find(tcirc<=tE,1,'last');
-             iE = max([iE,i0]); 
+             tE = (tin(i0).*24+lBlk)./24;   % end time of the bl-th block
+             iE = find(tcirc<=tE,1,'last'); % index of the end time in the series
+             iE = max([iE,i0]);  
 
-            Tbs = [Tbs; tcirc(i0:iE)];
-         lBlkbs = [lBlkbs; numel(i0:iE)];  
-           iTbs = [iTbs; [i0:iE]'];
+            Tbs = [Tbs; tcirc(i0:iE)];   % attach the block of dates to Tbs
+         lBlkbs = [lBlkbs; numel(i0:iE)];% record the length of the present block  
+           iTbs = [iTbs; [i0:iE]'];      % attach the block of indices to iTbs
 
         end
 
-               
-               iTbs = iTbs(1:ltin);
-        lBlocks{bs} = lBlkbs;
-        nBlocks(bs) = bl;
-         I0boot{bs} = I0rand(1:bl);
-         ITboot{bs} = iTbs;
-
-        % resamples
+        % construct the resamples by summing the resamples residual 
+        % and the original reconstruction
+        iTbs = iTbs(1:ltin);
         Yboot = nan(ltin,nDim);
         for d = 1 : nDim
-            Yboot(:,d) = Yhat(:,d) + Ycirc(iTbs,d);%Yres(iTbs,d);
+            Yboot(:,d) = Yhat(:,d) + Ycirc(iTbs,d);
         end
-        
         
             yboot = Yboot(:,1);
         if  opt.twodim
             yboot = complex(Yboot(:,1),Yboot(:,2));
         end
 
+        % store the simulated quantities
+        lBlocks{bs} = lBlkbs;
+        nBlocks(bs) = bl;
+         I0boot{bs} = I0rand(1:bl);
+         ITboot{bs} = iTbs;
             
-        % estimate model 
-        m_boot = boot_reg(wB, yboot(uvgd), w, opt);
-        coef_boot.M(:,bs) = m_boot;
+        % estimate the regression parameters for the resample 
+        m_boot = cut_boot_reg(wB, yboot(uvgd), w, opt);
+        coef_boot.M(:,bs) = m_boot; % store the paraemeters in coef_boot
             
      end
     
@@ -238,7 +234,7 @@ if strcmpi(bopt.mtd,'mbb')
      
 else
     
-    % remove block infos from the bootstrap structure
+    % remove the block info from the bootstrap structure
     bopt.lBlk = [];        
     bopt.lBlk_dist = [];
     tmmpseed = bopt.seed;
@@ -246,27 +242,13 @@ else
     % empty matrix of seeds
     pbootseed = nan(n_boot,nDim);
 
-            % interpolate missing values
+            % empty matrix for the residual FTT 
             FTTres = nan(nt,nDim);
             
             if opt.equi == 1  
-                
-                % eliminate Nan
-                % nonna  = find(~any(isnan(Yres),2)); 
-                % lfft   = length(nonna);
-                % FTTres = nan(nt,nDim);
-                nonna = find(uvgd);
-                
-                for d = 1 : nDim
-                    
-                    %   % interpolate missing values - OLD METHOD
-                    %            na = find( isnan(Yres(:,d)));   
-                    %           nna = find(~isnan(Yres(:,d))); 
-                    %    Yres(na,d) = interp1(nna,Yres(nna,d),na,'pchip',0);
-                    %    % print(mean(Yres))
-
-
-                    % estimate residual PSD 
+                nonna = find(uvgd); %locate NaNs
+                for d = 1 : nDim 
+                    % estimate the residual PSD at non-NaN time steps
                     FTTres(:,d) = fft(Yres(nonna,d)); 
                 end
             else
@@ -294,80 +276,44 @@ else
             coef_boot.boot.ResPsd(uvgd,:) = FTTres;
             
             
-            % % construct bootstrap resamples 
+            % % construct the parametric bootstrap resamples 
              for bs = 1 : n_boot
-                 
-                % print the iteration steps
-%                  if mod(bs,10^3)==0
-%                     disp([' ' num2str(bs) 'th boot iteration - ' datestr(now)])
-%                  end
 
-                   % construct the resamples 
-                    Yboot = nan(ltin,nDim);
-                    for d = 1 : nDim
-                        
-                        rng(pbootseed(bs,d)) % set the seed
-                        BootErr  = fftnoise(FTTres(:,d),1); % simulate a noise
-                        Yboot(uvgd,d) = Yhat(uvgd,d) + BootErr ; % sum the simulated noise to the original reconstruction
-                    end
-         
-                    % define the yboot sample at this iteration
-                    yboot = Yboot(:,1);
-                    if  opt.twodim
-                       yboot = complex(Yboot(:,1),Yboot(:,2));
-                    end
-                       
+                % construct the resamples 
+                Yboot = nan(ltin,nDim);
+                for d = 1 : nDim
+                    
+                    rng(pbootseed(bs,d)) % set the seed
+                    BootErr  = fftnoise(FTTres(:,d),1); % simulate a noise with same spectrum as the residuals
+                    Yboot(uvgd,d) = Yhat(uvgd,d) + BootErr ; % sum the simulated noise to the original reconstruction
+                end
+        
+                % define the yboot sample at this iteration
+                yboot = Yboot(:,1);
+                if  opt.twodim
+                    yboot = complex(Yboot(:,1),Yboot(:,2));
+                end
+                    
 
-                     % estimate model 
-                      m_boot = boot_reg(wB, yboot(uvgd), w, opt);
-           coef_boot.M(:,bs) = m_boot;                           
-           
-                    
-                    
+                % estimate the regression parameters for the resample 
+                m_boot = cut_boot_reg(wB, yboot(uvgd), w, opt);
+     coef_boot.M(:,bs) = m_boot;                           
+             
              end 
             
 end
+
 % from M to A,g, mean, and trend:
 coef_boot = cut_from_mboot_to_param(coef_boot,n_boot,opt,nNR,nR);
 coef_boot.boot.comp_time = toc;
 
-
 % output
-coef_boot.boot_opt = bopt;
-coef_boot.boot_opt.aux = coef.aux;
+coef_boot.boot_opt = bopt; % bootstrap options
+coef_boot.boot_opt.aux = coef.aux; % HA model setup
 end
 
 
             
 
 
-function m_boot = boot_reg(wB, yboot, w, opt) 
-% Apply the least square estimation on the model defined by the B basis
-% function and with the given opt 
-
-    switch opt.method
-
-        case 'ols'
-             iva = ~isnan(yboot);
-             m_boot = wB(iva,:)\yboot(iva);
-
-        case {'cauchy','andrews','bisquare','fair','huber', 'logistic','talwar','welsch','ridge', 'lasso', 'enet'}
-
-            if any(strcmpi(opt.method,{'ridge', 'lasso', 'enet'}))
-                warning([opt.method ' bootstrap not implemented yet >> using known weights'])
-                assert (~isempty(w), [opt.method ' bootstrap need known weights'] )
-            end
-
-            if ~isempty(w)  
-                % use the knwon weights in the regression  
-                   iva = ~isnan(yboot) & ~isnan(w);
-                m_boot = wB(iva,:)\(w(iva).*yboot(iva));
-            else
-                % re-estimate weights
-                   iva = ~isnan(yboot);
-                m_boot = robustfit(wB(iva,:),ctranspose(yboot(iva)),opt.method,opt.tunconst,'off');
-            end
-
-     end   
-end
 

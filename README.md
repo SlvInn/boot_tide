@@ -43,19 +43,19 @@ Specific analysis steps consist in:
 - choice of the regression estimator (e.g., ols vs irls, irls parameters, etc) and least square optimization; 
 - computation of basic statistics for model evaluation, further constituent selection, and residual analysis (e.g., CoefDist output structure).
 
-#### Subfunctions:
-... write docs ....
+<!-- #### Subfunctions:
+... write docs .... -->
 
 ### cut_reconstr.m 
 Generate hindcasts and/or forecasts/predictions at user-specified times using the HA coefficient structure computed by CUT_SOLV(). Specific steps of the reconstruction are:
 * select a list (e.g., a subset) of constituents from those estimated by cut_solv.m and compute the corresponding model basis function 
 * reconstruct the regression prediction based the selected list of constituents
 
-#### Subfunctions:
-... write docs ....
+<!-- #### Subfunctions:
+... write docs .... -->
 
 ## Residual resampling functions 
-Fumnction implementing two residual boostrap algorithms  for the analysis of residuals in HA uncertainty assessment:  
+Functions implementing two residual boostrap algorithms for the analysis of residuals in HA uncertainty assessment:  
 
 1. a Moving Block Bootstrap (MBB) that directly resamples fixed or random length blocks of the HA regression resisuals, and 
 2. a Semi-Parametric Bootstrap (SPB) that simulates noise realizations from the Fast Fourier Transform of the observed residuals. 
@@ -69,4 +69,9 @@ Innocenti, S. and Matte, P. and Fortin, V. and Bernier, N. B., (under review), R
 
 
 ### cut_boot.m 
+Construct residual resamples accoring to the specified algorith and execute the leat-square optimization of the regression model for each bootstrap resample. HA regression parameters for each resample are then expressed as tidal amplitude and phases. 
+
+**Note:** the SPB use the fttnoise.m function written and distributed by Aslak Grinsted (2009).
+
 ### cut_boot_reconstr.m 
+Generate hindcasts and/or forecasts/predictions at  user-specified times for each bootstrap replicate of the HA parameters. This function is similar to cut_reconstr.m but avoids recomputing the model basis function for each set of parameters. Accordingly, the HA model basis function is computed once, or it is read from the optional input arguments to further increase the computational efficiency.

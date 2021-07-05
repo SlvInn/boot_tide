@@ -7,41 +7,42 @@ function [u,v] = cut_reconstr(tin,coef,varargin)
 % - complete the comments in the sub-function scripts.
 %
 % OVERVIEW:
-% cut_reconstr.m generates hindcasts and/or forecasts/predictions at 
+% Generate hindcasts and/or forecasts/predictions at 
 % user-specified times using the HA coefficient structure computed by CUT_SOLV(). 
 % Specific steps of the reconstruction are:
 % - select a list (e.g., a subset) of constituents from those estimated by 
 %   cut_solv.m and compute the corresponding model basis function 
 % - reconstruct the regression prediction based the selected list of constituents
-
+%
 % Syntax for two-dimensional raw input, such as velocities:
-%     [ u_fit, v_fit ] = UR_RECONSTR ( t_fit, coef , {options} );
+%     [ u_fit, v_fit ] = cut_reconstr ( t_fit, coef , {options} );
 %
 % Syntax for one-dimensional raw input, such as sea level:
 %     [ sl_fit, ~ ] = cut_reconstr ( t_fit, coef , {options} ); 
 %
 %     Analysis of groups of records (TO BE TESTED)
-% The description below considers INPUTS, DEFAULTS, OPTIONS, and OUTPUT for treating a single record analysis. Modifications for treating a group of records with a single execution are given in Codiga (2011) and UTide help. 
+% The description below considers INPUTS, DEFAULTS, OPTIONS, and OUTPUT for 
+% treating a single record analysis. Modifications for treating a group of records 
+% with a single execution are given in Codiga (2011) and UTide help. 
 %
 % INPUT: 
-%     * t_fit = Column vector of arbitrary times [datenum UCT/GMT] distributed uniformly or irregularly. Hindcasts are produced at these time steps. If t_fit include NaNs, the outputs (u_fit/v_fit or sl_fit) will put NaNs at the corresponding time steps. 
+%     * t_fit = Column vector of arbitrary times [datenum UCT/GMT] distributed uniformly 
+%               or irregularly. Hindcasts are produced at these time steps. If t_fit include 
+%               NaNs, the outputs (u_fit/v_fit or sl_fit) will put NaNs at the corresponding time steps. 
 %     * coef  = results output structure from CUT_SOLV()
-%     * u_fit & v_fit, or sl_fit = reconstructed superposed harmonics
 %
-% {OPTIONS} 
-% OUTPUT:
-%     * t_fit    = Tx1 vector of times [datenum UTC] defining the dates at whcih hindcasts must be produced 
-%     * u_fit & v_fit, or sl_fit =  Tx1 vectors of reconstructed superposed harmonics 
-%
-%
-% OPTIONS:
+% {OPTIONS}:
 % Option flags are not case-sensitive but cannot be abbreviated. The option order is not relevant. Please refer to ut_solv.m help and Codiga (2011) 
 % for complete explanations of UTide options. 
-%     * ‘MinSNR’, MinSNR (num) to select constituents with SNR >= MinSNR. Default MinSNR=2.
-%     * ‘MinPE’, MinPE (num) to select constituents with PE > MinPE. Default MinPE=0. 
-%     If both ‘MinSNR’ and ‘MinPE’ are specified, no constituent with either 
-%     SNR or PE values lower than the defined thresholds will be used.
-%     * ‘Cnstit’, Cnstit (cell list of 4-character strings) define a list of 
+%     * ‘MinSNR’, MinSNR (num) to select constituents with SNR >= MinSNR. 
+%        Default MinSNR=2.
+%     * ‘MinPE’, MinPE (num) to select constituents with PE > MinPE. 
+%        Default MinPE=0. 
+%
+%        If both ‘MinSNR’ and ‘MinPE’ are specified, no constituent with either 
+%        SNR or PE values lower than the defined thresholds will be used.
+%
+%     * ‘Cnstit’, Cnstit (cell list of 4-character strings) list of 
 %       constituents, which must be used for regerssion hindcasts. The list of 
 %       names must include all or a subset of constituents in the coef.name 
 %       field of the  cut_solv() output structure. If ‘Cnstit’ is specified, the 
@@ -51,11 +52,9 @@ function [u,v] = cut_reconstr(tin,coef,varargin)
 %     * Constituents with SNR > 2 are included in the superposition. 
 %     * All options used for the HA regression are read from the coef structure, output of cut_solv().
 %
-% OUTPUTS:
-% u_fit & v_fit, or sl_fit
-%
-%     * Tx1 column vector(s) (same size as t_fit) containing the superposed
-%         harmonics and the mean (and trend if included in the model).
+% OUTPUT:
+%     * t_fit    = Tx1 vector of times [datenum UTC] defining the dates at which hindcasts must be produced 
+%     * u_fit & v_fit, or sl_fit =  Tx1 vector(s) of reconstructed series/hindcasts. 
 %
 % GROUPS OF RECORDS (TEMPORARILY ELIMINATED)
 %

@@ -4,7 +4,7 @@ function bopt = cut_bootinit(varargin)
 
 % set defaults for the bootstrap parameters
 bopt.seed      = 2*floor(rand(2,1)*(10^8)) +1; % define an odd number as pseudo-numebr generator seed 
-bopt.kw        = coef.W; % use HA wls/irls weights as knwon weights
+bopt.kw        = coef.W; % use the HA wls/irls weights as knwon weights
 
 bopt.mtd       = 'MBB';  % bootstrap type
 bopt.circular  = false;  % use circular MBB or not
