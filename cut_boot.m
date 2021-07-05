@@ -5,7 +5,9 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 % adapted versions cut_reconstr() and cut_solv()
 %
 % TO DO (some warnings have been set up for these issues):
-% - finish controls on user-defined inputs;
+% - define a more flexible way to treat the block length parameters 
+%   (presently expressed in days, i.e. in the same units as MATLAB datenums)
+% - finish checks on user-defined inputs;
 % - test the fucntions for2D analyses;
 % - test models with inferred constituents for modified models; 
 % 
@@ -38,15 +40,40 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 %
 %
 % OPTIONS:
-% 'method'/'mtd',  -
-% 'circular', true/false
+% 'method'/'mtd', mtdname - string indicating which bootstrap algorith must be used 
+%               to construct the residual resamples. Accepted strings are:
+%          'mbb' for implemeting the Moving Block Boostrap (either with fixed or random block length')
+%          'parboot', 'pboot', or 'psdboot' for the Semi-Parametric Bootstrap based on the residual power spectrum
+%           Default: 'mbb'
 %
-% 'blocklength'/'lblk',
+% 'circular', true/false  - boolean flag determining if a circular strategy 
+%           [Politis and Romano (1994)] must be used in constructing the resampels.
+%           Default: false
 %
-% 'lblk_dist'/'blockdist',
-% 'lblkpar'/'blocklengthparam',
+% 'lblk_dist'/'blockdist', distname - string defining the probability distribution 
+%            to extract/simulate the block lengths for each MBB resample.
+%            Allowed distname:
+%            * 'fix'  - blocks with fixed length = ndays (see the 'blocklength' input below), 
+%                       no distribution involved. 
+%            * 'geom' - blocks with random lengths esimulated from a geometric distribution with 
+%                       parameter 1/p = ndays (see the 'blocklength' input below)
+%            * 'pois' - blocks with random lengths esimulated from a poisson distribution with 
+%                       parameter lambda = ndays (see the 'blocklength' input below) 
+%            * 'unif' - blocks with random lengths esimulated from an uniform distribution with 
+%                       parameters [a,b] = ndays (see the 'blocklength' input below)
+%             Default: blockdist = 'geom'
+%            
+% 'blocklength'/'lblk', ndays - block length [days] for fixed length block in MBB 
+%                               Default: ndays = 31
 %
-% 'seed'
+% 'lblkpar'/'blocklengthparam', theta - block length distribution parameter(s) when using 
+%           random blocks MBB. Specifically, theta has the following interpretations:
+%            * inverse of the average block length for blockdist ='geom'. Default: 1/31 
+%            * average block length for blockdist = 'pois'. Default: 30 
+%            * min and max block length for blockdist = 'unif' (i.e. ndays is a 2-element vector). Default: [0,60] 
+%
+% 'seed', seeds - 2-element vector containing the random seeds to be used in the resampling.
+%           Tghe
 %   
 % 'knownweights', 'kweights', or 'kw' - 
 %
@@ -73,6 +100,9 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 %     mean -
 %     boot -
 % boot_opt - 
+%
+% -------- 
+% Politis and Romano (1994), DOI:10.1080/127301621459.1994.10476870
 %
 
 

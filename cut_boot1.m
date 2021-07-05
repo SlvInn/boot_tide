@@ -48,66 +48,19 @@ else
 end
     
 
-% Bootstrap options >> Set defaults
-bopt.mtd       = 'MBB';  % bootstrap type
-bopt.circular  = false;  % use circular MBB or not
-bopt.lBlk      = 31;     % mean block length [days] = 56 days for daily data
-bopt.lBlk_dist = 'pois'; % default distribution (name)
-bopt.seed      = 2*floor(rand(2,1)*(10^8)) +1; % define an odd number as pseudo-numebr generator seed 
-bopt.kw        = coef.W; % use HA wls/irls weights as knwon weights
-
-
-% read user-defined optional arguments
-optargin = size(varargin,2);
-
-i = 1;
-while i <= optargin
-    switch lower(varargin{i})
-        case {'method' 'mtd'}
-            bopt.mtd = varargin{i+1};
-            assert(any(strcmpi(bopt.mtd,{'mbb' 'pboot' 'parboot' 'psdboot'})),'not valid bootstrap method')
-          
-        case {'circular'}
-            bopt.circular = varargin{i+1};
-            assert(numel(bopt.circular)==1,'circular must be scalar (boolean or 0-1)')
-            assert(islogical(bopt.circular) || bopt.circular==0 || bopt.circular==1,'circular must be boolean or 0-1')
-                                
-        case {'lblk' 'blocklength' 'lblkpar' 'blocklengthparam'}
-            bopt.lBlk = varargin{i+1};
-               
-        case {'lblk_dist' 'blockdist'}
-            bopt.lBlk_dist = varargin{i+1};
-            legal_distrib = {'unif' 'pois' 'geom' 'fix'};
-            assert(any(strcmpi(bopt.lBlk_dist,legal_distrib)),['Not a valid sitribution for the simulation of MBB Block lengths,possible distributions are ' legal_distrib{:}])
-       
-       case 'seed' 
-           bopt.seed = varargin{i+1};
-           assert(numel(bopt.seed)==2,'bootstrap random seed must be a 2 element vector')
-           
-        case {'knownweights' 'kweights' 'kw'}
-           bopt.kw = varargin{i+1};
-           assert(numel(bopt.kw )==ltin || isempty(bopt.kw ),'known weight vector must be empty or have the same length as uin,vin')
-           
-        otherwise 
-            error(['cut_boot1: unrecognized input: ' varargin{i}]); 
-           
-    end
-    i = i + 2;
-end
-
-% controls on user-defined inputs
-% assert(~(isempty(bopt.lBlk) &&  strcmpi(bopt.mtd,'mbb')), 'you must specify min-max block length (''blocklength'') for the MBB method with non-hourly data ') 
+% Bootstrap options >> Set defaults and read the ser-defined inputs
+bopt = cut_bootinit(varargin)
 
 %% Prepare matrix for regression, based on hat-resonstructions
          
-% define empty inference
+% define (empty) inference (TO DO)
 % % assert(isempty(opt.infer),'Inference is not yer considered in the bootstrap function')
 
 % Get the basis function
 % options to compute the basis function
 ngflgs = [coef.aux.opt.nodsatlint coef.aux.opt.nodsatnone coef.aux.opt.gwchlint coef.aux.opt.gwchnone];
 
-% compute basis function 
+% compute the model basis function 
 [E,F,U,V] = cut_E(t,coef.aux.reftime,coef.aux.frq,coef.aux.lind,coef.aux.lat,ngflgs,coef.aux.opt);
         
 if ~opt.complexf % if sin/cos formulation 
@@ -184,7 +137,7 @@ end
  expNbl = ceil(4*(dt0e/(24*bopt.lBlk))); 
 
  
- tic 
+tic % start the time counteer
 if strcmpi(bopt.mtd,'mbb')
     
     % % construct bootstrap resamples 
@@ -194,59 +147,23 @@ if strcmpi(bopt.mtd,'mbb')
    nBlocks =  nan(n_boot,1);
     I0boot = cell(n_boot,1);
     ITboot = cell(n_boot,1);
+
+    % simulate the block lengths (if random bloks):
+    lBlkrand = cut_boot_blk_lengt(bopt)
     
-    switch bopt.lBlk_dist
-        
-        case 'unif'
-    
-        assert(numel(bopt.lBlk)==2,'MBB Block length vector must be a 2 element vector (min-max block lengths for an Uniform distribution)')
-        
-        % min-max block length in hours
-        minlBlk = bopt.lBlk(1)*24;
-        maxlBlk = bopt.lBlk(2)*24;
-        
-        rng(bopt.seed(2))
-        lBlkrand = randi([minlBlk maxlBlk],expNbl,n_boot);
-    
-
-        case 'pois' 
-        
-        assert(numel(bopt.lBlk)==1,'MBB Block length parameter (poisson distribution) must be a scalar (mean block lengths)')
-        
-        meanlBlk = bopt.lBlk;
-            rng(bopt.seed(2))
-        lBlkrand = 24.*poissrnd(meanlBlk-1, expNbl,n_boot)+1;
-
-        case 'geom' 
-        
-            assert(numel(bopt.lBlk)==1,'MBB Block length parameter (geometric distribution) must be a scalar (1/mean block lengths)')
-            assert(bopt.lBlk>0 && bopt.lBlk<1,'MBB Block length parameter must be a prob in (0,1)')
-
-            meanlBlk = bopt.lBlk;
-            rng(bopt.seed(2))
-        lBlkrand = 24.*geornd(meanlBlk, expNbl,n_boot);
-
-        case  'fix'
-
-        assert(numel(bopt.lBlk)==1,'MBB Block length (fixed length) must be a scalar')
-        assert(bopt.lBlk>=1 && bopt.lBlk<floor(ltin/24),'MBB Block length must be in [1,T]')
-         
-        meanlBlk = bopt.lBlk;
-        lBlkrand = 24.*repmat(meanlBlk, expNbl,n_boot);
-   end
    
    % extract random starts of the blocks
     rng(bopt.seed(1))
     I0rand = randi([1 ltin], expNbl,n_boot);
     
    
-   
-%    if strcmpi(bopt.lBlk_dist,'fix') && bopt.lBlk>=floor(ltin/24)-1
-%         I0rand = 1;
-%    else
-%     rng(bopt.seed(1))
-%     I0rand = randi([1 ltin], expNbl,n_boot);
-%    end
+% % (SI): OLD >>   
+% %    if strcmpi(bopt.lBlk_dist,'fix') && bopt.lBlk>=floor(ltin/24)-1
+% %         I0rand = 1;
+% %    else
+% %     rng(bopt.seed(1))
+% %     I0rand = randi([1 ltin], expNbl,n_boot);
+% %    end
   
    if bopt.circular
        tcirc = [tin(:); tin(:)];

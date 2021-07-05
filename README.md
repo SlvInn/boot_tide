@@ -55,6 +55,18 @@ Generate hindcasts and/or forecasts/predictions at user-specified times using th
 ... write docs ....
 
 ## Residual resampling functions 
+Fumnction implementing two residual boostrap algorithms  for the analysis of residuals in HA uncertainty assessment:  
+
+1. a Moving Block Bootstrap (MBB) that directly resamples fixed or random length blocks of the HA regression resisuals, and 
+2. a Semi-Parametric Bootstrap (SPB) that simulates noise realizations from the Fast Fourier Transform of the observed residuals. 
+
+Both methods are intended to produce similar results with comparable accuracy. The MBB can be applied in virtually all sampling conditions but it is more computationally demanding than SPB, especially for long records. The SPB is faster than the MBB but some sort of interpolation is needed for analyzing  irregularly sampled records or series with missing data, since it involves a Fourier analysis of residuals.  
+
+A detailed description of the two bootstraps can be found in the manuscript from Innocenti et al. (under review), while a teoretical summary is reported in https://www.youtube.com/watch?v=voEg6NEgT8M.
+
+---- 
+Innocenti, S. and Matte, P. and Fortin, V. and Bernier, N. B., (under review), Residual bootstrap methods for parameter uncertainty assessment in tidal analysis with temporally correlated noise, JTECH
+
 
 ### cut_boot.m 
 ### cut_boot_reconstr.m 
