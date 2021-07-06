@@ -71,7 +71,7 @@ Innocenti, S. and Matte, P. and Fortin, V. and Bernier, N. B., (under review), R
 ### cut_boot.m 
 Construct residual resamples accoring to the specified algorith and execute the leat-square optimization of the regression model for each bootstrap resample. HA regression parameters for each resample are then expressed as tidal amplitude and phases. 
 
-**Note:** the SPB use the fttnoise.m function written and distributed by Aslak Grinsted (2009).
+**Note:** the SPB use fttnoise.m (included in the Boot_Tide repo) by Aslak Grinsted (2009; https://www.mathworks.com/matlabcentral/fileexchange/32111-fftnoise-generate-noise-with-a-specified-power-spectrum).
 
 ### cut_boot_reconstr.m 
 Generate hindcasts and/or forecasts/predictions at  user-specified times for each bootstrap replicate of the HA parameters. This function is similar to cut_reconstr.m but avoids recomputing the model basis function for each set of parameters. Accordingly, the HA model basis function is computed once, or it is read from the optional input arguments to further increase the computational efficiency.
