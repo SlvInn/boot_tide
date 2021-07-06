@@ -1,5 +1,6 @@
 # MATLAB scripts for applying UTide HA and a resampling-based uncertainty analysis. 
 S. Innocenti - Last modification 30/06/2021
+
 Largely adapted from the UTide MATLAB package, Codiga (2011)
 [UTide v1p0 9/2011 d.codiga@gso.uri.edu; http://www.po.gso.uri.edu/~codiga/utide/utide.htm]
 
@@ -10,7 +11,7 @@ Users should be primarily interested in calling the following 4 functions:
 4. `cut_boot_reconstr.m` - Generates hindcast and/or forecast/prediction at user-specified times
 using the HA output from *_cut_reconstr()_*.
 
-the other scripts generally contains sub-functions for these 4 main programs. 
+The other scripts generally contains sub-functions for these 4 main programs. 
 The *_"cut"_* prefix in file name is used to differentiate the adapted scripts from the original UTide ones. Through the scripts, comments are used to identify and possibly explain the modifications made 
 with respect to the original UTide code [the #(SI) and #(PM) tags usually identify these modifications]. 
 
