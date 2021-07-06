@@ -1,9 +1,9 @@
 function [coef, CoefDist,NodCorr] = cut_solv1(tin,uin,vin,lat,cnstit,varargin)
-% S. Innocenti adapted from UT_SOLV1()
+% S. Innocenti adapted from ut_solv1() [UTide v1p0 9/2011 d.codiga@gso.uri.edu]
 % 2019/09
-% Tidal analysis of a single record. See comments for CUT_SOLV().
-% UTide v1p0 9/2011 d.codiga@gso.uri.edu 
-% 
+%
+% Tidal analysis of a single record. See comments for cut_solv().
+%
 % fprintf('ut_solv: '); % (SI): Commented
 %
 %% input checking/conditioning, options parsing
@@ -61,12 +61,12 @@ e = W*(xraw-xmod); % weighted Residuals used by UTide
 if opt.complexf
     
     % For NR & R cnstits: from complex coeffs to current ellipse &  Ampl/pha params
-    [coef,Xu,Yu,Xv,Yv] = cut_fromComplex2AmpPha(coef,m,nNR,nR,Q,beta,cnstit,lor,opt);
+    [coef,Xu,Yu,Xv,Yv] = cut_from_compx_to_amppha(coef,m,nNR,nR,Q,beta,cnstit,lor,opt);
     
 else
   
    % For NR & R cnstits: from cos/sin coeffs to current ellipse &  Ampl/pha params
-   [coef,Xu,Yu] = cut_fromSinCos2AmpPha(coef,m,nNR,nR,Q,beta,cnstit,lor,opt);
+   [coef,Xu,Yu] = cut_from_sincos_to_amppha(coef,m,nNR,nR,Q,beta,cnstit,lor,opt);
              Xv = [];
              Yv = []; 
 end
@@ -81,7 +81,7 @@ end
     end
 
     % NR & R cnstits: confidence intervals
-    [coef,varMSM,varcov_mCw,varcov_mCc,Gall,Hall,coefdiststr] = ... % Modified (SI) by adding ciefdiststr
+    [coef,varMSM,varcov_mCw,varcov_mCc,Gall,Hall,coefdiststr] = ... % Modified (SI) by adding ciefdiststr output
           cut_ci(xraw,m,B,W,coef,opt,Xu,Yu,Xv,Yv,Puu,Puv,Pvv,nm,nNR,nR);
       
       % create an output structure for the estimated var-cov and param distrib

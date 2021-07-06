@@ -22,13 +22,13 @@ function [nt,t,u,v,tref,lor,elor,opt,tgd,uvgd] = cut_slvinit(tin,uin,vin,cnstit,
 % UTide v1p0 9/2011 d.codiga@gso.uri.edu 
 
 %% input checking/reshaping
-assert(isequal(size(tin),size(uin)), 'But_solv: vectors of input times and input values must be same size.')
+assert(isequal(size(tin),size(uin)), 'ct_solv: vectors of input times and input values must be same size.')
 
     tgd = ~isnan(tin);
     uin = uin(tgd);
 
 if ~isempty(vin)
-    assert(isequal(size(tin),size(vin)), 'But_solv: vectors of input times and input values must be same size.')
+    assert(isequal(size(tin),size(vin)), 'cut_solv: vectors of input times and input values must be same size.')
     vin = vin(tgd);
     vin = vin(:);
     opt.twodim = 1;
@@ -42,11 +42,11 @@ end
     tin = tin(:);
    
 % some basic checks    
-assert(isequal(sort(tin),tin) || ~isequal(length(unique(tin)),length(tin)), 'But_solv: input times must be monotonically increasing.')    
-assert(~(min(tin)<datenum(500,0,0) || max(tin)>datenum(3500,0,0)),'But_solv: input times should be from the present millenium.')
+assert(isequal(sort(tin),tin) || ~isequal(length(unique(tin)),length(tin)), 'cut_solv: input times must be monotonically increasing.')    
+assert(~(min(tin)<datenum(500,0,0) || max(tin)>datenum(3500,0,0)),'cut_solv: input times should be from the present millenium.')
 
 uin = uin(:);
-assert(isequal(size(uin,2),1) || size(uin,1)<1,'But_solv: multiple input values required.')
+assert(isequal(size(uin,2),1) || size(uin,1)<1,'cut_solv: multiple input values required.')
 
 
 % only keep t,u,v values with non-nan u(&v) 
@@ -165,7 +165,7 @@ while ~isempty(args)
                    args(1) = [];
                 methnotset = 0;
             else
-                error('ut_solv: only one ''method'' option allowed.');
+                error('cut_solv: only one ''method'' option allowed.');
             end
             
         case 'alpha' % Added (SI) but experimental only - Elastic net parameter
@@ -222,7 +222,7 @@ while ~isempty(args)
             opt.runtimedisp = lower(args{2});
             args(1:2) = [];
         otherwise
-            error(['ut_solv: unrecognized input: ' args{1}]);
+            error(['cut_solv: unrecognized input: ' args{1}]);
     end
 end
 
@@ -234,7 +234,7 @@ end
 % checks on nodal corrections
 assert((opt.nodsatlint + opt.nodsatnone)<2,'cut_solv: only one of ''NodSatNone'' or ''NodSatLinT'' is allowed.')
 assert((opt.gwchlint   + opt.gwchnone<2), 'cut_solv: inconsistent inputs (only one gwch option allowed).')
-assert(opt.lsfrqosmp>=1,'But_solv: Lomb-Scargle frequency oversampling factor must be >=1.' )
+assert(opt.lsfrqosmp>=1,'cut_solv: Lomb-Scargle frequency oversampling factor must be >=1.' )
 
 % checks on the constituent selection parameters
 if ~isempty(opt.ordercnstit) 
