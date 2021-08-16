@@ -1,9 +1,13 @@
 function [coef,varMSM,varcov_mCw,varcov_mCc,Gall,Hall,CoefDist] = cut_ci(xraw,m,B,W,coef,opt,Xu,Yu,Xv,Yv,Puu,Puv,Pvv,nm,nNR,nR)
 % S. Innocenti adapted from ut_solv1() [UTide v1p0 9/2011 d.codiga@gso.uri.edu]
 % 2019/09
-% NEW OUTPUT: 
+% NEW OUTPUT (some quantities are computed only with the MC option on): 
 % coef.Std  - structure in coef containing the vectors of the standard error 
-%             estimated for each parameter
+%             estimated for each parameter.
+%             NOTE: for angular parameters circular statistics is used >> 
+%             coef.Std.g and coef.Std.theta contain the circular variance of the MC 
+%             parameter replicates. Linear statistics are saved in 
+%             coef.Std.g_lin/g_lin_ci, coef.Std.theta_lin/theta_lin_ci
 %
 % CoefDist  - structure containing the var-cov estimates and MC simulations
 %             and the Monte-Carlo simulations for complex parameters, as well 
@@ -13,7 +17,7 @@ function [coef,varMSM,varcov_mCw,varcov_mCc,Gall,Hall,CoefDist] = cut_ci(xraw,m,
 %    CoefDist.Sig.W  -  white    component of the UTide var-cov matrix 
 %    CoefDist.Sig.C  -  coloured component of the UTide var-cov matrix
 %    
-% 
+%    In the cut_prepareout function, the following fileds will be also added:
 %    CoefDist.M_mc         -  Monte-Carlo replicates of M parameters 
 %    CoefDist.A_mc / g_mc  -  Monte-Carlo replicates of amplitude and phases
 %    OR 
@@ -62,10 +66,14 @@ end
    CoefDist.Sig.Se = varMSM; % scalar residual standard error (sigma epsilon)
    CoefDist.Sig.W  = [];     % white component of the var-cov
    CoefDist.Sig.C  = [];     % coloured component of the var-cov
-   CoefDist.M_mc   = nan(size(coef.M,1),opt.nrlzn); % produced MC simulations
-       coef.M_rlzn = [];     % same as CoefDist.M_mc but in the coef output
+% %    CoefDist.M_mc   = nan(size(coef.M,1),opt.nrlzn); % produced MC simulations % moved in cut_prepareoutput
+       coef.M_rlzn = [];     %  produced MC simulations
 
- 
+
+% convert dregrees to/from radiants (factors)       
+d2r = (pi./180);
+r2d = 1./(pi./180);
+
 % main loop on constituents
 for c = 1:nc % for each constituent
     
@@ -138,9 +146,18 @@ for c = 1:nc % for each constituent
                         g(1) = coef.g(c);
                            g = ut_cluster(g,360);
             coef.g_rlzn(c,:) = g; %added (PM)
-                         mad = median(abs(g-median(g)));  % LINEAR meadian! no sense (SI)
-             coef.Std.g(c,1) = mad/0.6745; % Added (SI)   
-               coef.g_ci(c)  = 1.96*coef.Std.g(c);
+
+            % OLD:
+            %              mad = median(abs(g-median(g)));  % LINEAR meadian! no sense (SI)
+            %  coef.Std.g(c,1) = mad/0.6745; % Added (SI)   
+            %    coef.g_ci(c)  = 1.96*coef.Std.g(c); 
+            %
+            % NEW (SI):
+            % >> LINEAR statistics 
+            coef.Std.g_lin(c,1)  = median(abs(g-median(g)))/0.6745; 
+                coef.g_lin_ci(c) = 1.96*coef.Std.g_lin(c);
+            % >> CIRCULAR statistics     
+                coef.Std.g(c,1)  = circ_var(d2r*g(:));    
             
                % (SI): The way A_ci and g_ci are computed should be changed: 
                % - variable significance level
@@ -189,7 +206,6 @@ for c = 1:nc % for each constituent
             end
             
             % Added (SI)
-          
             sigMc = diag(sigMc); % Added (SI) 2020/04/17 >>  to be tested for 2D series
             for jj = 1 : 4 
                 CoefDist.M_mc((jj-1)*nc + c,:) = mCall(:,jj ); % Added (SI)
@@ -209,20 +225,38 @@ for c = 1:nc % for each constituent
                  coef.Lsmin_ci(c) = 1.96*coef.Std.Lsmin(c);
              coef.Lsmin_rlzn(c,:) = Lsmin; % Added (SI)
         
-                         theta(1) = coef.theta(c);
-                            theta = ut_cluster(theta,360);
-                            
-                              mad = median(abs(theta-median(theta)));
-              coef.Std.theta(c,1) = mad/0.6745;  % Added (SI)   
-                coef.theta_ci(c)  = 1.96*coef.Std.theta(c);
-             coef.theta_rlzn(c,:) = theta; % Added (SI)
+                        theta(1) = coef.theta(c);
+                           theta = ut_cluster(theta,360);
+            coef.theta_rlzn(c,:) = theta; % Added (SI)
+            % OLD                
+            %                   mad = median(abs(theta-median(theta)));
+            %   coef.Std.theta(c,1) = mad/0.6745;  % Added (SI)   
+            %     coef.theta_ci(c)  = 1.96*coef.Std.theta(c);
+            %  
+            % NEW (SI):
+            % >> LINEAR statistics 
+            coef.Std.theta_lin(c,1)  = median(abs(theta-median(theta)))/0.6745; 
+            coef.theta_lin_ci(c)     = 1.96*coef.Std.theta_lin(c);
+            % >> CIRCULAR statistics     
+            coef.Std.theta(c,1)  = circ_var(d2r*theta(:));  
                  
-                             g(1) = coef.g(c);
-                                g = ut_cluster(g,360);
-                              mad = median(abs(g-median(g)));  
-                  coef.Std.g(c,1) = mad/0.6745;  % Added (SI)   
-                  coef.g_ci(c)    = 1.96*coef.Std.g(c);
-                 coef.g_rlzn(c,:) = g; % Added (SI)
+                        g(1) = coef.g(c);
+                           g = ut_cluster(g,360);
+            coef.g_rlzn(c,:) = g; % Added (SI)  
+
+            % OLD:
+            %               mad = median(abs(g-median(g)));  
+            %   coef.Std.g(c,1) = mad/0.6745;  % Added (SI)   
+            %   coef.g_ci(c)    = 1.96*coef.Std.g(c);
+            %  
+            %
+            % NEW (SI):
+            % >> LINEAR statistics 
+            coef.Std.g_lin(c,1)  = median(abs(g-median(g)))/0.6745; 
+                coef.g_lin_ci(c) = 1.96*coef.Std.g_lin(c);
+            % >> CIRCULAR statistics     
+                coef.Std.g(c,1)  = circ_var(d2r*g(:));   
+
         end
     end
     
@@ -233,18 +267,23 @@ end
  CoefDist.Sig.C = varcov_mCc;
     coef.M_rlzn = CoefDist.M_mc;
 
- % If monte-carlo add the simulated values of parameters in the output
- % structure CoefDist: % % Added (SI)
- if ~opt.linci % linearized
-         CoefDist.g_mc = coef.g_rlzn;
-     if ~opt.twodim
-         CoefDist.A_mc = coef.A_rlzn;
-     else
-         CoefDist.Lsmaj_mc = coef.Lsmaj_rlzn;
-         CoefDist.Lsmin_mc = coef.Lsmin_rlzn;
-         CoefDist.theta_mc = coef.theta_rlzn;
-     end
- end
+% % % ==== % % % 
+% The following portion of code has been moved in prepare output
+% % % ==== % % % 
+% Added (SI):
+% If monte-carlo add the simulated values of parameters in the output
+% structure CoefDist: 
+% 
+%  if ~opt.linci % linearized
+%          CoefDist.g_mc = coef.g_rlzn;
+%      if ~opt.twodim
+%          CoefDist.A_mc = coef.A_rlzn;
+%      else
+%          CoefDist.Lsmaj_mc = coef.Lsmaj_rlzn;
+%          CoefDist.Lsmin_mc = coef.Lsmin_rlzn;
+%          CoefDist.theta_mc = coef.theta_rlzn;
+%      end
+%  end
 
 end
 
