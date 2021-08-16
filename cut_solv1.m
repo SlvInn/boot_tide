@@ -102,7 +102,7 @@ end
     end
 
 %% re-order constituents and prepare output
-coef = cut_prepareout(coef,opt);
+[coef,CoefDist] = cut_prepareout(coef,opt,CoefDist);
 
 %% create coef.results, reorder coef fields, do runtime display
 coef = cut_finish(coef,nNR,nR,nI,elor,cnstit);
