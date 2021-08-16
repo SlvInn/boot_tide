@@ -34,7 +34,7 @@ parameter replicates].
 
 ---- 
 Foreman and Henry, 1989 - DOI:10.1016/0309-1708(89)90017-1
-
+Berens, 2009 - https://www.jstatsoft.org/article/view/v031i10
 
 ### cut_solv.m 
 Define the analysis setup and execute the leat-square optimization of the regression model. 
