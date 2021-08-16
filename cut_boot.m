@@ -12,7 +12,7 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 % - test models with inferred constituents for modified models; 
 %
 % NOTES:
-% 1. NEVER TESTED FOR 2D-SERIES%
+% 1. NEVER TESTED FOR 2D-SERIES !
 % 2. Not working for groups of records (this option was present in UTide, 
 % but it has been eliminated here)
 %
@@ -39,7 +39,7 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 % n_boot - (int) Number of bootstrap resamples used to generate the distributions
 %
 %
-% {OPTIONS}:
+% {OPTIONS/VARARGIN}:
 % 'method'/'mtd', mtdname - string indicating which bootstrap algorithm must be used 
 %               to construct the residual resamples. Accepted strings are:
 %          'mbb' for implementing the Moving Block Boostrap (either with fixed or random block length')
@@ -72,23 +72,32 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 %            * average block length for blockdist = 'pois'. Default: 30 
 %            * min and max block length for blockdist = 'unif' (i.e. ndays is a 2-element vector). Default: [0,60] 
 %
+%
+% NOTE: The 'circular', 'blockdist', 'blocklength', and 'blocklengthparam' options
+%       are ignored when using SPB. 
+%
+%
 % 'seed', seeds - 2-element vector containing the random seeds to be used in the 
 %           resampling. For MBB, the first seed is used in the simulation of the block 
 %           random starts, while the second is used in the simulation of the block lengths.
 %           For the SPB, only the first seed is used to initialize the fttnoise function.  
 %
-% 'knownweights'/'kweights'/'kw', kwvect - Tx1 or empty vector of known WLS weights to be cosidered 
+% 'knownweights'/'kweights'/'kw', kwvect - Tx1 or empty vector of known WLS weights that will be used  
 %       in the HA regression of each resample. Default: kwvect = coef.W 
 %       (i.e. use the original HA wls/irls weights, if present in coef). 
 %       IF kwvect = [], the IRLS method is applied for each resample (robustfit.m), 
 %       otherwise, the known weights are used as in a GLS. 
 %       These weights represent estimates of the reciprocal of the observation std 
-%       NOTE: weight are assumed w = 1 / sigma_ii, while some IRLS models use
+%       NOTE: weights are assumed w = 1 / sigma_ii, while some IRLS models use
 %       bisquared weights [i.e., w = 1 / (sigma_ii^2)]; consider
 %       using the sqrt of the weights through the option "knownweights", if needed. 
 %      
-% NOTE: The 'circular', 'blockdist', 'blocklength', and 'blocklengthparam' options
-%       are ignored when using SPB. 
+%       
+% 'knownresiduals'/'yres'/'residuals', kyres - Tx1 vector or Tx2 matrix  of known regression residuals 
+%       to be used to construct the bootstrap resamples. Default: [] - Estimated by cut_reconstr1.m
+%
+% 'knownreconstr'/'yhat'/'reconstr' , kyhat - Tx1 vector or Tx2 matrix  of known regression predictions  
+%       to be used to construct the bootstrap resamples. Default: [] - Estimated by cut_reconstr1.m
 %
 %
 % OUTPUT:

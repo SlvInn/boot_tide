@@ -4,7 +4,7 @@ function bopt = cut_bootinit(coef,tin,varargin)
 
 % set default variables for resampling the regression model
 bopt.kw        = coef.W; % use the HA wls/irls weights as knwon weights
-bopt.kB        = [];     % known basis function for the model
+% bopt.kB        = [];     % known basis function for the model
 bopt.Yhat      = [];     % tidal reconstruction  based on the estimated HA model
 bopt.Yres      = [];     % HA model residuals 
 
@@ -55,15 +55,16 @@ while i <= optargin
            if ~isempty(bopt.kw)
                 assert(numel(bopt.kw)==numel(coef.W),'the input weight vector must have the same length as the estimated vector')
            end
-        case {'basis' 'b'}   
-            bopt.kB = varargin{i+1};
-            if ~isempty(bopt.kB)
-                [rB,cB] = size(B)
-                assert(rB==numel(coef.W),'basis matrix size is not consistent with observation and time vector length')
-                assert(cB==numel(coef.M),'basis matrix size is not consistent with the number of estimated coefficients in coef.M')
-            end
 
-        case {'yres' 'residuals'}
+        % case {'knownbasis' 'basis' 'b'}   
+        %     bopt.kB = varargin{i+1};
+        %     if ~isempty(bopt.kB)
+        %         [rB,cB] = size(B)
+        %         assert(rB==numel(coef.W),'basis matrix size is not consistent with observation and time vector length')
+        %         assert(cB==numel(coef.M),'basis matrix size is not consistent with the number of estimated coefficients in coef.M')
+        %     end
+
+        case {'knownresiduals' 'yres' 'residuals'}
             bopt.Yres  = varargin{i+1}; 
             if coef.aux.opt.twodim 
                 assert(size(bopt.Yres,2)==2,"residuals must be a 2-column matrix")
@@ -72,7 +73,7 @@ while i <= optargin
                 assert(length(bopt.Yres)==numel(tin), 'residuals must have the same length as observation and time vectors')
             end
 
-        case {'yhat' 'reconstr'}    
+        case {'knownreconstr' 'yhat' 'reconstr'}    
             bopt.Yhat  = varargin{i+1};  
             
             if coef.aux.opt.twodim 
