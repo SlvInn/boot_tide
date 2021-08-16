@@ -14,21 +14,30 @@ function [coef_boot,B] = cut_boot1(tin,uin,vin,coef,n_boot,varargin)
 % heritate estimation options
 opt = coef.aux.opt;
 
-% reconstruct the original series based on the estiamted parameters (i.e. regression fit)
-[uhat,vhat] = cut_reconstr1(tin,coef,'cnstit',coef.name);
+% Bootstrap options >> Set defaults and read the ser-defined inputs
+bopt = cut_bootinit(coef,varargin)
+print(bopt)
 
-% check series dimension
-if opt.twodim   
-    nDim = 2;
-    Yhat = [uhat,vhat];
-    Yres = [uhat-uin,vhat-vin];
-    warning('the code must be checked and tested for the two dimentional case')   
-else 
-    nDim = 1;
-    Yhat = uhat;
-    Yres = uhat-uin;   
+% get the HA reconstructions and residuals
+if isempty(bopt.Yhat) % if we have no Yhat calculated
+    % reconstruct the original series based on the estiamted parameters (i.e. regression fit)
+    [uhat,vhat] = cut_reconstr1(tin,coef,'cnstit',coef.name);
+
+    % check series dimension
+    if opt.twodim   
+        nDim = 2;
+        Yhat = [uhat,vhat];
+        Yres = [uhat-uin,vhat-vin];
+        warning('the code must be checked and tested for the two dimentional case')   
+    else 
+        nDim = 1;
+        Yhat = uhat;
+        Yres = uhat-uin;   
+    end
+else % if they are provided by the user
+    Yhat = bopt.Yhat;
+    Yres = bopt.Yres;  
 end
-
 
 % get the input length and remore NaNs
 ltin = numel(tin);
@@ -37,81 +46,37 @@ if opt.twodim
 else
     uvgd = ~isnan(uin);
 end
-t = tin(uvgd);
-nt = numel(t);
-     
-% define the LOR for equispaced or irregularly sampled series        
-if opt.equi == 1 % based on times; u/v can still have nans ("gappy")
-    lor = (max(tin)-min(tin)); 
-else
-    lor = (max(t) - min(t));   
-end
-    
 
-% Bootstrap options >> Set defaults and read the ser-defined inputs
-bopt = cut_bootinit(varargin)
+% time vector without nan:
+t  = tin(uvgd);
 
-%% Prepare matrix for regression, based on hat-resonstructions
+
+%% -- Prepare matrix for the bootstrap regressions -- %%
          
-% define (empty) inference (TO DO)
+% % define (empty) inference (TO DO)
 % % assert(isempty(opt.infer),'Inference is not yer considered in the bootstrap function')
 
-% Get the basis function
-% options to compute the basis function
-ngflgs = [coef.aux.opt.nodsatlint coef.aux.opt.nodsatnone coef.aux.opt.gwchlint coef.aux.opt.gwchnone];
+% Get the basis function 
+if isempty(bopt.kB) % if no basis has been provided in input   
+    B = cut_get_B_boot(coef,tin,t);
+else % if the user provided a known basis funtion 
+    B = bopt.kB;
+end     
 
-% compute the model basis function 
-[E,F,U,V] = cut_E(t,coef.aux.reftime,coef.aux.frq,coef.aux.lind,coef.aux.lat,ngflgs,coef.aux.opt);
-        
-if ~opt.complexf % if sin/cos formulation 
-    B = [F.*cos(2*pi*(U+V)), F.*sin(2*pi*(U+V))];
-    
-    if ~isempty(opt.infer)
-        error 'not done yet: inference must be adapted to the sin/cos definition of the model >> try with complexf option = true'
-        % see the other part of the IF statement (when opt.infer is ~empty)
-    else
-          Q = [];
-       beta = [];
-         nR = 0;
-        nNR = numel(coef.name);
-    end
-else % if complex formulation 
-    B = [E conj(E)];
-    
-    if ~isempty(opt.infer)
-        error 'not done yet: inference must be adapted to the sin/cos definition of the model >> try with complexf option = true'
-    else
-          Q = [];
-       beta = [];
-         nR = 0;
-        nNR = numel(coef.name);
-    end
-    
-end
-
-% include (a) column(s) for temporal trends
-if opt.notrend
-    B = [B ones(nt,1)];
-else
-    B = [B ones(nt,1) (t-coef.aux.reftime)/lor];   
-end
-    
 % define a weighted matrix, if needed
 if ~isempty(bopt.kw)
-    w = sqrt(bopt.kw(uvgd));
-    W = diag(w);
-    wB = (W*B); % OK
+    w  = sqrt(bopt.kw(uvgd));
+    wB = (diag(w)*B); % OK
 else
-    w = [];
+    w  = [];
     wB = B;
-end         
-          
-           
- % empties 
+end  
+         
+%% --  define empties -- %%
  coef_boot.name = coef.name;    
-          nM    = numel(coef.M);
+           nM   = numel(coef.M);
  coef_boot.M    = nan(nM,n_boot);
-          nC    = numel(coef.name);
+           nC   = numel(coef.name);
  coef_boot.g    = nan(nC,n_boot);
 if ~opt.complexf                     
     coef_boot.A    = nan(nC,n_boot);
