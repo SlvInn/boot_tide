@@ -28,7 +28,7 @@ function [S,s] = circ_var(alpha, w, d, dim)
 % Circular Statistics Toolbox for Matlab
 
 % By Philipp Berens, 2009
-% berens@tuebingen.mpg.de - www.kyb.mpg.de/~berens/circStat.html
+% berens@tuebingen.mpg.de - https://www.jstatsoft.org/article/view/v031i10
 
 if nargin < 4
   dim = 1;

@@ -24,6 +24,8 @@ Major modifications to UTide consist in:
 * Allowing to solve the HA based on a non-complex formulation of the regression model 
 in 1D analyses [i.e. as in Foreman and Henry, 1989, and Innocenti et al., submitted to JTECH].
 *  Adding some useful output for 1D analyses [e.g., return some statistics for uncertainty assessments in the CoefDist and coef.aux structures]. **NOTE:** not all these quantities have been added (yet) to the 2D-analysis output.
+* Considering circular statistics for tidal phases when using the monte carlo estimation of parameter standard errors [`coef.Std.g/theta` contain now the circular variance of the MC 
+parameter replicates].
 * Allowing to use ridge, lasso, or elastic-net estimators for the HA regerssion. 
 **NOTE:** these code options have not been thoroughly tested (use at your own risk) but the code includes many warnings related to the use of these estimators.
 * Separating *_ut_solv.m_* in various scripts and add comments to improve readability of subfuctions. 
