@@ -40,16 +40,16 @@ varMSM = real((ctranspose(xraw)*W*xraw - ctranspose(m)*ctranspose(B)*W*xraw)/(nt
    
             
 % inits
-  coef.g_ci   = nan*ones(size(coef.g));
+  coef.g_lin_ci   = nan*ones(size(coef.g));
   coef.g_rlzn = nan(size(coef.g,1),opt.nrlzn); % Added (SI)
 
 if opt.twodim
-    coef.Lsmaj_ci = coef.g_ci;
-    coef.Lsmin_ci = coef.g_ci;
-    coef.theta_ci = coef.g_ci;
+    coef.Lsmaj_ci = coef.g_lin_ci;
+    coef.Lsmin_ci = coef.g_lin_ci;
+    coef.theta_lin_ci = coef.g_lin_ci;
        varcov_mCw = nan*ones(nc,4,4);
 else
-      coef.A_ci   = coef.g_ci;
+      coef.A_ci   = coef.g_lin_ci;
       coef.A_rlzn = coef.g_rlzn; % Added (SI)
        varcov_mCw = nan*ones(nc,2,2);
 end
@@ -62,7 +62,7 @@ end
 
   % % Added (SI):
   % define the  CoefDist structure to contain the output for uncertainty
-  % analysis (var-cov estimates and MC simulations)
+  % analysis (var-cov estimates and MC simulations) 
    CoefDist.Sig.Se = varMSM; % scalar residual standard error (sigma epsilon)
    CoefDist.Sig.W  = [];     % white component of the var-cov
    CoefDist.Sig.C  = [];     % coloured component of the var-cov
@@ -72,7 +72,7 @@ end
 
 % convert dregrees to/from radiants (factors)       
 d2r = (pi./180);
-r2d = 1./(pi./180);
+% r2d = 1./(pi./180);
 
 % main loop on constituents
 for c = 1:nc % for each constituent
@@ -150,7 +150,7 @@ for c = 1:nc % for each constituent
             % OLD:
             %              mad = median(abs(g-median(g)));  % LINEAR meadian! no sense (SI)
             %  coef.Std.g(c,1) = mad/0.6745; % Added (SI)   
-            %    coef.g_ci(c)  = 1.96*coef.Std.g(c); 
+            %    coef.g_lin_ci(c)  = 1.96*coef.Std.g(c); 
             %
             % NEW (SI):
             % >> LINEAR statistics 
@@ -159,7 +159,7 @@ for c = 1:nc % for each constituent
             % >> CIRCULAR statistics     
                 coef.Std.g(c,1)  = circ_var(d2r*g(:));    
             
-               % (SI): The way A_ci and g_ci are computed should be changed: 
+               % (SI): The way A_ci and g_lin_ci are computed should be changed: 
                % - variable significance level
                % - asymmetric interval 
                % - no linear inteval for g (angular variable) 

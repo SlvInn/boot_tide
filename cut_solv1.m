@@ -54,7 +54,7 @@ if ~opt.twodim
 end
 
 %% Residuals
-solnstats.res = (xraw-xmod); % Added (SI): unweighted residuals, to be used!
+solnstats.res = (xraw-xmod); % Added (SI): unweighted residuals, what we should use!
 e = W*(xraw-xmod); % weighted Residuals used by UTide
 
 

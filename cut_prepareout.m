@@ -7,7 +7,7 @@ function [coef,CoefDist] = cut_prepareout(coef,opt,CoefDist)
 
 
 % get the constituent order
-ind = get_out_cnstit_order(coef,opt) 
+ind = get_out_cnstit_order(coef,opt);
 
 % prepare output
  coef.name      = coef.name(ind);
@@ -33,9 +33,9 @@ ind = get_out_cnstit_order(coef,opt)
    coef.Std.M = [MS(ind,:); MC(ind,:); MT]; 
 
     % reorder the varcov matrices (to be checked):
-        varcov_mCw = CoefDist.Sig.W
+        varcov_mCw = CoefDist.Sig.W;
     CoefDist.Sig.W = varcov_mCw(ind,:,:);
-        varcov_mCc = CoefDist.Sig.C
+        varcov_mCc = CoefDist.Sig.C;
     CoefDist.Sig.C = varcov_mCc(ind,:,:);
 
 % (SI):  check for opt.twodim
@@ -88,6 +88,8 @@ end
          CoefDist.Lsmin_mc = coef.Lsmin_rlzn;
          CoefDist.theta_mc = coef.theta_rlzn;
      end
+     coef.Std.S = CoefDist.Sig;
+      
  end
 
 end

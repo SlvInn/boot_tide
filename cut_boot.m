@@ -90,8 +90,7 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 %       These weights represent estimates of the reciprocal of the observation std 
 %       NOTE: weights are assumed w = 1 / sigma_ii, while some IRLS models use
 %       bisquared weights [i.e., w = 1 / (sigma_ii^2)]; consider
-%       using the sqrt of the weights through the option "knownweights", if needed. 
-%      
+%       using the sqrt of the weights through the option "knownweights", if needed.       
 %       
 % 'knownresiduals'/'yres'/'residuals', kyres - Tx1 vector or Tx2 matrix  of known regression residuals 
 %       to be used to construct the bootstrap resamples. Default: [] - Estimated by cut_reconstr1.m
@@ -104,20 +103,39 @@ function [coef_boot,B] = cut_boot(tin,uin,vin,coef,n_boot,varargin)
 % coef_boot - coefficient structure containing the following fields (assuming 
 %             no trend in the model for the specification of the matrix sizes)
 %
-%                M - (2K+1) x n_boot matrix of sin-cos or complex regression 
-%                    coefficients estimated for each resample.
-% A or Lsmaj,Lsmin - K x n_boot matrices of tidal amplitudes estimated for each resample
-%     g or g,theta - K x n_boot matrices of tidal phases estimated for each resample
-%                W - Nx1 vector of known weights or Nxn_boot matrix of weights 
-%                    estimated on each resample via the IRLS method.
-%             mean - n_boot-element vector of HA regression intercepts 
-%             boot - structure containing the generated residual resamples 
-%         boot_opt - structure containing the detailed options used for generating 
-%                    the residual and parameter resamples
+%           (fields with the bootstrap replicates of the parameters:)
+%                M_rlzn - (2K+1) x n_boot matrix of sin-cos or complex regression 
+%                         coefficients estimated for each resample.
+%             A_rlzn or 
+% Lsmaj_rlzn,Lsmin_rlzn - K x n_boot matrices of tidal amplitudes estimated for each resample
+%             g_rlzn or 
+%     g_rlzn,theta_rlzn - K x n_boot matrices of tidal phases estimated for each resample             
+%          mean_rlzn or 
+% umean_rlzn,vmean_rlzn - n_boot x 1 vectors of HA regression intercepts 
+%
+%            (fields with the bootstrap point estimate of the parameters:)
+%                 M - (2K+1) x 1 vector of the component-wise means of the M_rlzn coefficients
+%                         
+%  A or Lsmaj,Lsmin - K x 1 vector of the tidal amplitudes corresponding to M
+%    
+%      g or g,theta - K x 1 vectors of tidal phases corresponding to M             
+%mean or umean,vmean- K x 1 vectors of the HA intercepts corresponding to M
+%  
+%              (structure with the bootstrap variability of the parameters:)
+%               Std - structure with the standard error estimated component-wise for
+%                     each amplitude, phase, mean, and trend parameter; the
+%                     circular variance is compute for phases.
+%
+%              u or u,v - T x 1 vectors of observations reconstructed using the original HA model
+%                     W - Nx1 vector of known weights or Nxn_boot matrix of weights 
+%                         estimated on each resample via the IRLS method.
+%                     B - T x (2K+1) design matrix defining the HA regression model 
+%                  boot - structure containing the generated residual resamples 
+%              boot_opt - structure containing the detailed options used for generating 
+%                     the residual and parameter resamples
 %
 % -------- 
 % Politis and Romano (1994), DOI:10.1080/127301621459.1994.10476870
-
 
 
 if isequal(size(coef.g,2),1) % single record 
@@ -125,7 +143,7 @@ if isequal(size(coef.g,2),1) % single record
     
 else % group of records
 
-    error 'to be checked here : test if it works for too dimensions and adapt the output (see cut_solve.m)'
+    error 'test if the code works for two dimensions and groups of records >> adapt the output (see cut_solve.m)'
     %{
     n_t = size(tin,1); 
     % alln = [n_1 n_2 n_3 ... n_n_d]

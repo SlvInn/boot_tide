@@ -20,9 +20,9 @@ if ~isfield(coef,'g')
            coef.Lsmin = coef.Lsmaj;
         coef.Lsmin_ci = coef.Lsmaj;
            coef.theta = coef.Lsmaj;
-        coef.theta_lin_ci = coef.Lsmaj;
+    coef.theta_lin_ci = coef.Lsmaj;
                coef.g = coef.Lsmaj;
-            coef.g_lin_ci = coef.Lsmaj;
+        coef.g_lin_ci = coef.Lsmaj;
            coef.umean = NaN;
            coef.vmean = NaN;
            
@@ -48,7 +48,7 @@ if ~isfield(coef,'g')
            coef.A = nan*ones(size(coef.name));
         coef.A_ci = coef.A;
            coef.g = coef.A;
-        coef.g_lin_ci = coef.A;
+    coef.g_lin_ci = coef.A;
         coef.mean = NaN;
         
           coef.Std.A  = NaN;
@@ -167,6 +167,7 @@ if ~isnan(coef.g(1))
         end
     else
         coef.results = char(coef.results,[' Cnstit      A      A_ci         g      g_lin_ci']);
+        
          main = [coef.A coef.A_ci coef.g coef.g_lin_ci];
         for i = 1:nallc
             coef.results = char(coef.results,sprintf(['%4s %#9.3g %#9.3g %#9.3g %#9.3g'],coef.name{i},main(i,:)));
@@ -183,13 +184,13 @@ end
 
 %% order fields
 if coef.aux.opt.twodim
-    fldord = {'name'; 'Lsmaj'; 'Lsmaj_ci'; 'W';'M'; 'M_rlzn'; ... % Added 'W', 'M', and 'M_rlzn' (SI)
-              'Lsmin'; 'Lsmin_ci'; 'theta'; 'theta_lin_ci'; 'g'; 'g_lin_ci';...
+    fldord = {'name'; 'W';'M'; 'M_rlzn'; ... % Added 'W', 'M', and 'M_rlzn' (SI)
+              'Lsmaj'; 'Lsmaj_ci'; 'Lsmin'; 'Lsmin_ci'; 'theta'; 'theta_lin_ci'; 'g'; 'g_lin_ci';...
               'Lsmaj_rlzn'; 'Lsmin_rlzn'; 'theta_rlzn'; 'g_rlzn'; ... % Added (SI)
-              'umean'; 'vmean'; 'constr', 'Std'}; % Added 'constr' and 'Std' (SI)
+              'umean'; 'vmean'; 'Std'; 'constr'}; % Added 'constr' and 'Std' (SI)
 else
-    fldord = {'name'; 'A'; 'A_rlzn'; 'A_ci'; 'g'; 'g_rlzn'; 'g_lin_ci';'W';'M'; 'M_rlzn';...  % Added 'W' (PM) 'W','M', and 'M_rlzn' (SI)
-              'mean';  'constr'; 'Std'}; % Added 'constr' and 'Std' (SI)
+    fldord = {'name'; 'W';'M'; 'M_rlzn'; 'A'; 'A_rlzn'; 'A_ci'; 'g'; 'g_rlzn'; 'g_lin_ci';...  % Added 'W' (PM) 'W','M', and 'M_rlzn' (SI)
+              'mean';   'Std'; 'constr';}; % Added 'constr' and 'Std' (SI)
 end
 if ~coef.aux.opt.notrend
     if coef.aux.opt.twodim

@@ -3,7 +3,7 @@ function coef_boot = cut_from_mboot_to_param(coef_boot,n_boot,opt,nNR,nR) %add Q
 % tidal amplitude and phases for each bootstrap resample
 
     for bs = 1 : n_boot
-        m_boot = coef_boot.M(:,bs);
+        m_boot = coef_boot.M_rlzn(:,bs);
 
         if opt.complexf==1
 
@@ -21,32 +21,32 @@ function coef_boot = cut_from_mboot_to_param(coef_boot,n_boot,opt,nNR,nR) %add Q
             Xu = real(ap+am);
             Yu = -imag(ap-am);
             if ~opt.twodim
-                [coef_boot.A(:,bs),~,~,coef_boot.g(:,bs)] = ut_cs2cep([Xu Yu]);
+                [coef_boot.A_rlzn(:,bs),~,~,coef_boot.g_rlzn(:,bs)] = ut_cs2cep([Xu Yu]);
             else
                 Xv = imag(ap+am);
                 Yv = real(ap-am);
 
-                [coef_boot.Lsmaj(:,bs),coef_boot.Lsmin(:,bs),coef_boot.theta(:,bs),coef_boot.g(:,bs)] = ut_cs2cep([Xu Yu Xv Yv]);
+                [coef_boot.Lsmaj_rlzn(:,bs),coef_boot.Lsmin_rlzn(:,bs),coef_boot.theta_rlzn(:,bs),coef_boot.g_rlzn(:,bs)] = ut_cs2cep([Xu Yu Xv Yv]);
             end
 
-   
+  
             % mean and trend
             if opt.twodim
                 if opt.notrend
-                    coef_boot.umean(1,bs) = real(m_boot(end));
-                    coef_boot.vmean(1,bs) = imag(m_boot(end));
+                    coef_boot.umean_rlzn(1,bs) = real(m_boot(end));
+                    coef_boot.vmean_rlzn(1,bs) = imag(m_boot(end));
                 else
-                    coef_boot.umean(1,bs) = real(m_boot(end-1));
-                    coef_boot.vmean(1,bs) = imag(m_boot(end-1));
-                    coef_boot.uslope(1,bs) = real(m_boot(end))/lor;
-                    coef_boot.vslope(1,bs) = imag(m_boot(end))/lor;
+                    coef_boot.umean_rlzn(1,bs)  = real(m_boot(end-1));
+                    coef_boot.vmean_rlzn(1,bs)  = imag(m_boot(end-1));
+                    coef_boot.uslope_rlzn(1,bs) = real(m_boot(end))/lor;
+                    coef_boot.vslope_rlzn(1,bs) = imag(m_boot(end))/lor;
                 end
             else
                 if opt.notrend
-                    coef_boot.mean(1,bs) = real(m_boot(end));
+                    coef_boot.mean_rlzn(1,bs)  = real(m_boot(end));
                 else
-                    coef_boot.mean(1,bs) = real(m_boot(end-1));
-                    coef_boot.slope(1,bs) = real(m_boot(end))/lor;
+                    coef_boot.mean_rlzn(1,bs)  = real(m_boot(end-1));
+                    coef_boot.slope_rlzn(1,bs) = real(m_boot(end))/lor;
                 end
             end
 
@@ -60,20 +60,20 @@ function coef_boot = cut_from_mboot_to_param(coef_boot,n_boot,opt,nNR,nR) %add Q
                 % Q,beta, and cnstit would be used here
             end
 
-            coef_boot.A(:,bs) = sqrt(ap.^2 + am.^2);
+            coef_boot.A_rlzn(:,bs) = sqrt(ap.^2 + am.^2);
                           pha = atan2d(am,ap);
                           pha = ut_cluster(pha,360);
                    pha(pha<0) = 360+pha(pha<0);
-            coef_boot.g(:,bs) = pha;
+            coef_boot.g_rlzn(:,bs) = pha;
 
 
 
             %% mean and trend
             if opt.notrend
-                coef_boot.mean(1,bs)  = real(m_boot(end));
+                coef_boot.mean_rlzn(1,bs)  = real(m_boot(end));
             else
-                coef_boot.mean(1,bs)  = real(m_boot(end-1));
-                coef_boot.slope(1,bs) = real(m_boot(end))/lor;
+                coef_boot.mean_rlzn(1,bs)  = real(m_boot(end-1));
+                coef_boot.slope_rlzn(1,bs) = real(m_boot(end))/lor;
             end
 
 
