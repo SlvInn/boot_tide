@@ -65,15 +65,17 @@ else
 end
     
 % -- HARD-CODED NO INFERENCE: -- %
-assert(~isempty(opt.infer),'inference constituent canèt be included, yet')
-   Q = []; 
-beta = []; 
+assert(isempty(opt.infer),'inference constituent canèt be included, yet')
+%    Q = []; 
+% beta = []; 
   nR = 0;
  nNR = numel(coef.name);
+ fakecnstit.NR = caux; % create a fake structure that can be passed to cut_BEFUV if no inference
 % -- %
 
-%% ------ Prepare matrix for the bootstrap regressions ------- %%
-B = cut_BEFUV(t,caux.reftime,cnstit,opt,caux.lat,nt,nNR,nR,lor)    
+% prepare the matrix for the bootstrap regressions 
+B = cut_BEFUV(t,caux.reftime,fakecnstit,opt,caux.lat,nt,nNR,nR,lor);   
+%{
 % OLD:      
 % options to compute the basis function
 % ngflgs = [opt.nodsatlint opt.nodsatnone opt.gwchlint opt.gwchnone];
@@ -114,6 +116,7 @@ B = cut_BEFUV(t,caux.reftime,cnstit,opt,caux.lat,nt,nNR,nR,lor)
 %  B = [B ones(nt,1) (t-caux.reftime)/lor];   
 % end   
 % ------------------------------------- %
+%}
 
 % construct resample and re-estimate the parameters on each one
 coef_boot = cut_bootcore(coef,tin,uvgd,B,Yres,Yhat,bopt,n_boot);
@@ -124,14 +127,19 @@ coef_boot = cut_from_mboot_to_param(coef_boot,n_boot,opt,nNR,nR);
 % coeff statistics
 coef_boot = cut_boot_stats(coef_boot,n_boot,opt,nNR,nR);
 
-% output
+% % % finalize the output % % % 
+
+% add the original reconstruction
 coef_boot.u = Yhat(:,1);
 if opt.twodim 
-    coef_boot.v = Yhat(:,2);
+   coef_boot.v = Yhat(:,2);
 end
 
-coef_boot.boot_opt = bopt;     % bootstrap options
-coef_boot.boot_opt.aux = caux; % HA model setup
+% bootstrap options
+coef_boot.boot_opt = bopt;  
+
+% HA model setup
+coef_boot.boot_opt.aux = caux; 
 
 % order fields
 coef_boot = cut_boot_finish(coef_boot,opt);
