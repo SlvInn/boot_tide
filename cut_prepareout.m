@@ -33,6 +33,9 @@ ind = get_out_cnstit_order(coef,opt);
    coef.Std.M = [MS(ind,:); MC(ind,:); MT]; 
 
     % reorder the varcov matrices (to be checked):
+                nb = size(CoefDist.Sig.B,1);
+    CoefDist.Sig.B = CoefDist.Sig.B([ind,nc+ind,2*nc+1:nb],:);
+    CoefDist.Sig.B = CoefDist.Sig.B(:,[ind,nc+ind,2*nc+1:nb]);
         varcov_mCw = CoefDist.Sig.W;
     CoefDist.Sig.W = varcov_mCw(ind,:,:);
         varcov_mCc = CoefDist.Sig.C;
