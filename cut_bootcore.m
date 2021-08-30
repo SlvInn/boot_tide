@@ -13,6 +13,8 @@ function coef_boot = cut_bootcore(coef,tin,uvgd,B,Yres,Yhat,bopt,n_boot)
 %      B - model basis (HA regressor matrix)
 %   Yres - T x 1 vector of HA regression residuals
 %   Yhat - T x 1 vector of HA predictions/reconstructions
+%   botp - Structure containing the options for applying the bootstrap >> see cut_bootinit.m for a 
+%	description of this structure and available defaults 
 % n_boot - (int) Number of bootstrap resamples used to generate the distributions
 %
 % OUTPUT:
@@ -60,10 +62,10 @@ if strcmpi(bopt.mtd,'mbb')
    % % construct bootstrap resamples 
    
    % empties
-  lBlocks = cell(n_boot,1);
-  nBlocks =  nan(n_boot,1);
-   I0boot = cell(n_boot,1);
-   ITboot = cell(n_boot,1);
+  lBlocks = cell(n_boot,1);% length of each block for each bootstrap resample (when using variable block length)
+  nBlocks =  nan(n_boot,1);% num of blocks in each resample 
+   I0boot = cell(n_boot,1);% index of the start time of  each block 
+   ITboot = cell(n_boot,1);% time indices of each block for each resample
 
    % simulate the block lengths (if random bloks):
    lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot);
@@ -82,6 +84,7 @@ if strcmpi(bopt.mtd,'mbb')
 % %     I0rand = randi([1 ltin], expNbl,n_boot);
 % %    end
  
+% double the time vector to allow for circular bootstrap
   if bopt.circular
       tcirc = [tin(:); tin(:)];
       Ycirc = [Yres;Yres];
