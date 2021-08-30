@@ -64,11 +64,12 @@ end
   % define the  CoefDist structure to contain the output for uncertainty
   % analysis (var-cov estimates and MC simulations) 
    CoefDist.Sig.Se = varMSM; % scalar residual standard error (sigma epsilon)
+   CoefDist.Sig.B  = Gall;   % sigma beta
    CoefDist.Sig.W  = [];     % white component of the var-cov
    CoefDist.Sig.C  = [];     % coloured component of the var-cov
-% %    CoefDist.M_mc   = nan(size(coef.M,1),opt.nrlzn); % produced MC simulations % moved in cut_prepareoutput
-       coef.M_rlzn = [];     %  produced MC simulations
-
+% %  CoefDist.M_mc   = nan(size(coef.M,1),opt.nrlzn); % produced MC simulations % moved in cut_prepareoutput
+%        coef.M_rlzn = [];     %  produced MC simulations
+       
 
 % convert dregrees to/from radiants (factors)       
 d2r = (pi./180);
@@ -266,6 +267,17 @@ end
  CoefDist.Sig.W = varcov_mCw;
  CoefDist.Sig.C = varcov_mCc;
     coef.M_rlzn = CoefDist.M_mc;
+
+    
+%     
+% if opt.twodim
+%     warning('umean and vmean std must be estimated >> setting them to empty')
+%     CoefDist.umean_mc = [];
+%     CoefDist.vmean_mc = [];
+% else
+%     CoefDist.mean_mc = 
+% end
+
 
 % % % ==== % % % 
 % The following portion of code has been moved in prepare output
