@@ -16,7 +16,7 @@ caux = coef.aux;
 opt  = coef.aux.opt;
 
 % Bootstrap options >> Set defaults and read the ser-defined inputs
-bopt = cut_bootinit(coef,varargin);
+bopt = cut_bootinit(coef,tin,varargin{:});
 
 
 % get the HA reconstructions and residuals
