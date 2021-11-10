@@ -201,7 +201,7 @@ else
                for d = 1 : nDim
                    
                    rng(pbootseed(bs,d)) % set the seed
-                   BootErr  = rftt_skew_noise(validres(:,d),1); % simulate a noise with same spectrum as the residuals
+                   BootErr  = noisecopy(validres(:,d),1); % simulate a noise with same spectrum as the residuals
                    Yboot(uvgd,d) = Yhat(uvgd,d) + BootErr ; % sum the simulated noise to the original reconstruction
                end
        

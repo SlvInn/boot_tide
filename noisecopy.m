@@ -1,4 +1,4 @@
-function noise = rFFTnoise(x,Nseries)
+function noise = noisecopy(x,Nseries)
 % Generate noise with a given power spectrum while also controlling 
 % skewnees and the kurtosis of the simulated signal
 %
