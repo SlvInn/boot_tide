@@ -68,7 +68,7 @@ if strcmpi(bopt.mtd,'mbb')
    ITboot = cell(n_boot,1);% time indices of each block for each resample
 
    % simulate the block lengths (if random bloks):
-   lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot);
+   lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot,ltin);
    
   
   % simulate/draw random starts of the blocks

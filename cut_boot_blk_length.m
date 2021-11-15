@@ -1,4 +1,4 @@
-function lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot)
+function lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot,ltin)
 % S. Innocenti. 2019/09 - modified 2021/06
 % simulate the random block lengths or get a vector of (equal) fixed lengths
 
