@@ -68,7 +68,7 @@ if strcmpi(bopt.mtd,'mbb')
    ITboot = cell(n_boot,1);% time indices of each block for each resample
 
    % simulate the block lengths (if random bloks):
-   lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot);
+   lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot,ltin);
    
   
   % simulate/draw random starts of the blocks
@@ -204,7 +204,11 @@ else
                for d = 1 : nDim
                    
                    rng(pbootseed(bs,d)) % set the seed
+<<<<<<< HEAD
                    BootErr  = fftnoise_daniell(FTTres(:,d),1); % simulate a noise with same spectrum as the residuals
+=======
+                   BootErr  = noisecopy(validres(:,d),1); % simulate a noise with same spectrum as the residuals
+>>>>>>> c4e9d54e9c63fa833110e157c9359e3978304faf
                    Yboot(uvgd,d) = Yhat(uvgd,d) + BootErr ; % sum the simulated noise to the original reconstruction
                end
        
