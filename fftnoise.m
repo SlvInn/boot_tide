@@ -1,4 +1,4 @@
-function noise = fftnoise(f,Nseries)
+function noise = fftnoise_daniell(f,Nseries)
 % Generate noise with a given power spectrum.
 % Useful helper function for Monte Carlo null-hypothesis tests and confidence interval estimation.
 %  
@@ -38,11 +38,26 @@ end
 f  = f(:);
 N  = length(f);
 Np = floor((N-1)/2);
+
+
+% Daniell avg the spectrum (boxcar avg)
+  B   = ones(16,1) ;
+  B   = B./sum(B) ;
+  msk = ones(N,1) ;
+
+  
+% apply a running mean of 16 values
+  f = conv2(f,B,'same')./conv2(msk,B,'same'); %for older Matlab versions
+ 
+
+% simulate the random phases
 phases = rand(Np,Nseries)*2*pi;
 phases = complex(cos(phases),sin(phases)); % this was the fastest alternative in my tests. 
 
+% multiply the phases and the ftt for each resample
                    f = repmat(f,1,Nseries);
          f(2:Np+1,:) = f(2:Np+1,:).*phases;
+         
+% apply the IFFT         
 f(end:-1:end-Np+1,:) = conj(f(2:Np+1,:));
-
 noise = real(ifft(f,[],1)); 
