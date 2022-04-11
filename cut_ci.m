@@ -1,4 +1,4 @@
-function [coef,varMSM,varcov_mCw,varcov_mCc,Gall,Hall,CoefDist] = cut_ci(xraw,m,B,W,coef,opt,Xu,Yu,Xv,Yv,Puu,Puv,Pvv,nm,nNR,nR)
+function [coef,varMSM,varcov_mCw,varcov_mCc,Gall,Hall,CoefDist] = cut_ci(xraw,M,B,W,coef,opt,Xu,Yu,Xv,Yv,Puu,Puv,Pvv,nm,nNR,nR)
 % S. Innocenti adapted from ut_solv1() [UTide v1p0 9/2011 d.codiga@gso.uri.edu]
 % 2019/09
 % NEW OUTPUT (some quantities are computed only with the MC option on): 
@@ -26,14 +26,18 @@ function [coef,varMSM,varcov_mCw,varcov_mCc,Gall,Hall,CoefDist] = cut_ci(xraw,m,
     nt = size(xraw,1);
     nc = nNR+nR;
     
+
+mp = (M(1:nc)-1i*M(nc+1:2*nc))/2;
+mm = (M(1:nc)+1i*M(nc+1:2*nc))/2;
+m0 = M((2*nc)+1:end);
+m  = [mp(:); mm(:); m0(:)];
+
+
 %% NR & R cnstits: confidence intervals
 varMSM = real((ctranspose(xraw)*W*xraw - ctranspose(m)*ctranspose(B)*W*xraw)/(nt-nm)); % sigma-e 
-
   gamC = inv(ctranspose(B)*W*B)*varMSM; %#ok
-  gamP = 0.*gamC; % Added (SI): if we use the sin-cos model formulation the pseudo-cov must be 0
-  if opt.complexf~=0 % if complex formulation - Added (SI)
-     gamP = inv(transpose(B)*W*B)*((transpose(xraw)*W*xraw - transpose(m)*transpose(B)*W*xraw)/(nt-nm)); %#ok
-  end
+  gamP = inv(transpose(B)*W*B)*((transpose(xraw)*W*xraw - transpose(m)*transpose(B)*W*xraw)/(nt-nm)); %#ok
+  
   
   Gall = gamC+gamP; % sum of covariance and pseudo-covariance
   Hall = gamC-gamP; % diff
@@ -269,33 +273,8 @@ end
     coef.M_rlzn = CoefDist.M_mc;
 
     
-%     
-% if opt.twodim
-%     warning('umean and vmean std must be estimated >> setting them to empty')
-%     CoefDist.umean_mc = [];
-%     CoefDist.vmean_mc = [];
-% else
-%     CoefDist.mean_mc = 
-% end
 
 
-% % % ==== % % % 
-% The following portion of code has been moved in prepare output
-% % % ==== % % % 
-% Added (SI):
-% If monte-carlo add the simulated values of parameters in the output
-% structure CoefDist: 
-% 
-%  if ~opt.linci % linearized
-%          CoefDist.g_mc = coef.g_rlzn;
-%      if ~opt.twodim
-%          CoefDist.A_mc = coef.A_rlzn;
-%      else
-%          CoefDist.Lsmaj_mc = coef.Lsmaj_rlzn;
-%          CoefDist.Lsmin_mc = coef.Lsmin_rlzn;
-%          CoefDist.theta_mc = coef.theta_rlzn;
-%      end
-%  end
 
 end
 

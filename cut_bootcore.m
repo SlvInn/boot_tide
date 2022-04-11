@@ -68,7 +68,7 @@ if strcmpi(bopt.mtd,'mbb')
    ITboot = cell(n_boot,1);% time indices of each block for each resample
 
    % simulate the block lengths (if random bloks):
-   lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot);
+   lBlkrand = cut_boot_blk_length(bopt,expNbl,n_boot,ltin);
    
   
   % simulate/draw random starts of the blocks
@@ -119,7 +119,7 @@ if strcmpi(bopt.mtd,'mbb')
           iTbs = [iTbs; [i0:iE]'];      % attach the block of indices to iTbs
 
        end
-
+                
        % construct the resamples by summing the resamples residual 
        % and the original reconstruction
        iTbs = iTbs(1:ltin);
@@ -163,13 +163,14 @@ else
    pbootseed = nan(n_boot,nDim);
 
            % empty matrix for the residual FTT 
-           validres = nan(nt,nDim);
+           %validres = nan(nt,nDim);
+           fftres = nan(nt,nDim);
            
            if opt.equi == 1  
                nonna = find(uvgd); %locate NaNs
                for d = 1 : nDim 
                    % estimate the residual PSD at non-NaN time steps
-                   validres(:,d) = Yres(nonna,d); 
+                   fftres(:,d) = fft(Yres(nonna,d)); 
                end
            else
                
@@ -179,7 +180,7 @@ else
                for d = 1 : nDim
                    % interpolate non-missing values over a regular
                    % time vector [to be changed]
-                   validres(:,d) = interp1(t,Yres(uvgd,d),teq,'pchip',0);;  
+                   fftres(:,d) = fft(interp1(t,Yres(uvgd,d),teq,'pchip',0));  
                end
 
            end
@@ -189,8 +190,8 @@ else
            pbootseed(:,d) = 2*floor(rand(n_boot,1)*(10^5)) +1;
            
            % save residua PSD
-        %    coef_boot.boot.ResPsd = nan(nt,1);
-        %    coef_boot.boot.ResPsd(uvgd,:) = FTTres;
+           coef_boot.boot.ResPsd = nan(nt,1);
+           coef_boot.boot.ResPsd(uvgd,:) = fftres;
            
            
            % % construct the parametric bootstrap resamples 
@@ -199,10 +200,13 @@ else
                % construct the resamples 
                Yboot = nan(ltin,nDim);
                for d = 1 : nDim
-                   
+                  
                    rng(pbootseed(bs,d)) % set the seed
-                   BootErr  = rFFTnoise(validres(:,d),1); % simulate a noise with same spectrum as the residuals
-                   Yboot(uvgd,d) = Yhat(uvgd,d) + BootErr ; % sum the simulated noise to the original reconstruction
+%                    BootErr  = rFFTnoise(validres(:,d),1); % simulate a noise with same spectrum as the residuals
+                   BootErr  = fftnoise(fftres(:,d),1);
+                    Yboot(uvgd,d) = Yhat(uvgd,d) + BootErr ; % sum the simulated noise to the original reconstruction
+                   
+
                end
        
                % define the yboot sample at this iteration

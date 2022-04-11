@@ -82,8 +82,9 @@ optargin = size(varargin,2);
 
 i = 1;
 while i <= optargin
+   
     switch lower(varargin{i})
-        case {'method' 'mtd'}
+        case {'method','mtd'}
             bopt.mtd = varargin{i+1};
             assert(any(strcmpi(bopt.mtd,{'mbb' 'pboot' 'parboot' 'psdboot'})),'not valid bootstrap method')
           

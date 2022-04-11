@@ -6,7 +6,13 @@ function coef_boot = cut_boot_stats(coef_boot,n_boot,opt,nNR,nR)
 
 
     % compute the component-wise mean of M 
-   coef_boot.M = nanmean(coef_boot.M_rlzn,2);
+    M = coef_boot.M_rlzn;
+    nMr =  size(M,1);
+    coef_boot.M = nan(nMr,1);
+    for r = 1 : nMr
+        Mr = M(r,:);
+   coef_boot.M(r) = mean(Mr(~isnan(Mr)));
+    end
 
     % compute the amplitude, phase, mean, and trend parameters corresponding to the mean M
        mcoef_b = coef_boot;

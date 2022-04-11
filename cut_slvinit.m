@@ -321,12 +321,12 @@ end
 
 
 % (SI): add warnings for some specific configurations
-if opt.white == 1
-   if ~strcmpi(opt.method, 'ols')
-      warning(['''white'' and ' opt.method ' options found in input >>' ... 
-          'using a WLS estimator (var-cov matrix ~= withe noise)'])
-   end
-end 
+% if opt.white == 1
+%    if ~strcmpi(opt.method, 'ols')
+%       warning(['''white'' and ' opt.method ' options found in input >>' ... 
+%           'using a WLS estimator (var-cov matrix ~= withe noise)'])
+%    end
+% end 
 
 % if opt.nrlzn<100
 %      warning([num2str(opt.nrlzn) ' MC replicate may not suffice to approximate parameter distribution ' ...
