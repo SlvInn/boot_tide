@@ -121,7 +121,7 @@ B = cut_BEFUV(t,caux.reftime,fakecnstit,opt,caux.lat,nt,nNR,nR,lor);
 
 % construct resample and re-estimate the parameters on each one
 % coef_boot = cut_bootcore(coef,tin,uvgd,B,Yres,Yhat,bopt,n_boot);
-coef_boot = cut_bootcore_with_danielspb(coef,tin,uvgd,B,Yres,Yhat,bopt,n_boot);
+coef_boot = cut_bootcore_with_daniellspb(coef,tin,uvgd,B,Yres,Yhat,bopt,n_boot);
 
 % from M to A,g, mean, and trend:
 coef_boot = cut_from_mboot_to_param(coef_boot,n_boot,opt,nNR,nR);

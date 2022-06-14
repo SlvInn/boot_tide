@@ -17,15 +17,15 @@ coef.constr = [0 NaN];        % [Lambda Alpha]; % Added (SI)
 lastwarn(''); % initialise 
 switch opt.method
     
-    case 'ols'
-              m = B\xraw;
-            % m = regress(xraw,B);
-
-            solnstats.w     = [];
-            solnstats.resid = [];
-
-    case {'cauchy','andrews','bisquare','fair','huber', 'logistic','talwar','welsch'}
-        
+%     case 'ols'
+%               m = B\xraw;
+%             % m = regress(xraw,B);
+%
+%             solnstats.w     = [];
+%             solnstats.resid = [];
+%
+%     case {'cauchy','andrews','bisquare','fair','huber', 'logistic','talwar','welsch'}
+      case {'ols','cauchy','andrews','bisquare','fair','huber', 'logistic','talwar','welsch'}        
         [m,solnstats] = robustfit(B,ctranspose(xraw),opt.method,opt.tunconst,'off');
       
       
