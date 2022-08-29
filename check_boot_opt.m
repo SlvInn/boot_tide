@@ -25,14 +25,19 @@ assert(islogical(opt.circular) || opt.circular==0 || opt.circular==1,'circular m
    
 # MBB (fix) block length
 if strcmpi(opt.method,'mbb') 
-    assert(numel(opt.lblock)==1 && opt.lblock>1,'lblock must be a number >1 [N of days]')
+    assert(numel(opt.lblock)==1 && opt.lblock>1,'lblock must be a number >1 [N of hours]')
 
-    dt = nanmax(data.t) - nanmin(data.t);
-    if opt.lblock > 0.1*dt
+    dt = nanmax(data.t) - nanmin(data.t); % [days]
+    if opt.lblock > 0.1*(dt*24) % the block length must be at least 1/10 of series length in hours
         warning('check_boot_opt: block length greater than 1/10 of the observed time period')
     end
 else
-    opt.lblock = NaN;
+
+    % remove the block info from the bootstrap structure
+    opt.lblock      =  NaN;
+    opt.lblock_par  =  NaN;
+    opt.lblock_dist = 'none';
+    
 end    
 
 # MBB (variable) block length distribution name [block length sampler]:
@@ -41,25 +46,41 @@ assert(any(strcmpi(opt.lblock_dist,legal_distrib)), ['Not a valid lblock_dist fo
 
 # MBB (variable) block length distribution parameter(s)
 if strcmpi(opt.method,'mbb')
-   if isempty(opt.lblock_par) 
-        disp(['set default block length parameter for ' opt.lblock_dist 'MBB'])
+    if isempty(opt.lblock_par) 
+        ## disp(['set default block length parameter for ' opt.lblock_dist 'MBB'])
+
         switch opt.lBlk_dist
             case 'geom'
-                opt.lblock_par = 1/31;
+                opt.lblock_par = 1/(30*24 +1); % probability parameter p
             case 'unif' 
-                opt.lblock_par = [0,60];
+                opt.lblock_par = [0, 60*24];   % min-max block length in hours
             case 'pois' 
-                opt.lblock_par = 30;
+                opt.lblock_par = 30*24 + 1;
             case 'fix'
-            assert(~isnan(opt.lblock),"block length cannot be NaN for fix length MBB")
-            opt.lblock_par = opt.lblock
+                opt.lblock_par = opt.lblock
         end
-        
-   end
+    else
+
+        switch opt.lBlk_dist
+            case 'geom'
+                assert(numel(opt.lblock_par )==1,'MBB block length parameter (geometric distribution) must be a scalar (1/mean block length)')
+                assert(opt.lblock_par>0 && opt.lblock_par<1,'MBB block length parameter must be a probability in (0,1)')
+            case 'unif' 
+                assert(numel(opt.lblock_par)==2,'MBB block length vector must be a 2 element vector (min-max block lengths for an uniform distribution)')
+            case 'pois' 
+                assert(numel(opt.lblock_par)==1,'MBB block length parameter (poisson distribution) must be a scalar (mean block length)') 
+            case 'fix'
+                assert(numel(opt.lblock_par)==1,'MBB block length must be a scalar')
+                assert(~isnan(opt.lblock_par),"block length cannot be NaN for fix length MBB")
+                assert(opt.lblock_par>1 && opt.lblock_par< opt.lblock_par,'MBB Block length must be in (1,T]')
+        end
+
+
+
+
+    end
 else
     opt.lblock_par = NaN;
 end
 
-% SILVIA: SONO QUI >> finisci di fare cut_bootinit.m from line 166
-% aggiungi dei commenti e dei warnings per i parametri messi a Nan 
 end

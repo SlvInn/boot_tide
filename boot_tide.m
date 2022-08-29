@@ -38,23 +38,23 @@ function out = boot_tide(time,y,varargin)
 %            Default: 'geom'
 %
 %            Allowed distname:
-%            * 'fix'  - blocks with fixed length = ndays (see the 'blocklength' input below), 
+%            * 'fix'  - blocks with fixed length = nhours (see the 'blocklength' input below), 
 %                       no distribution involved. 
 %            * 'geom' - blocks with random lengths esimulated from a geometric distribution with 
-%                       parameter 1/p = ndays (see 'lblock_par' definition below)
+%                       parameter 1/p = nhours (see 'lblock_par' definition below)
 %            * 'pois' - blocks with random lengths esimulated from a poisson distribution with 
-%                       parameter lambda = ndays (see 'lblock_par' definition below)
+%                       parameter lambda = nhours (see 'lblock_par' definition below)
 %            * 'unif' - blocks with random lengths esimulated from an uniform distribution with 
-%                       parameters [a,b] = ndays (see 'lblock_par' definition below)
+%                       parameters [a,b] = nhours (see 'lblock_par' definition below)
 %
 % 'lblock_par', theta - block length distribution parameter(s) when using 
 %           random blocks MBB. Specifically, theta has the following interpretations:
-%            * inverse of the average block length for blockdist ='geom'. Default: 1/31 
-%            * average block length for blockdist = 'pois'. Default: 30 
-%            * min and max block length for blockdist = 'unif' (i.e. ndays is a 2-element vector). Default: [0,60] 
+%            * inverse of the average block length for blockdist ='geom'. Default: 1/(30*24 +1) 
+%            * average block length for blockdist = 'pois'. Default: 30*24 
+%            * min and max block length for blockdist = 'unif' (i.e. nhours is a 2-element vector). Default: [0,60*24] 
 %                      
-% 'lblock', ndays - block length [in days] for fixed length block in MBB 
-%           Default: ndays = 31
+% 'lblock', nhours - block length [in hours] for fixed length block in MBB 
+%           Default: 30*24 + 1 
 %
 % NOTE: The 'circular', 'lblock_dist', 'lblock_par', and 'lblock' options
 %       are ignored when using SPB. 
@@ -73,11 +73,19 @@ function out = boot_tide(time,y,varargin)
 %
 %
 % 
-% OUTPUT:
-% out - 
+% OUTPUT: 
+% structure with fields:
+% options -
+% yhat    - 
+% yres    -
 %
+% For options.method = 'mbb', the following fields are also returned: 
+% iboot  - 
+% blocks -
 %
-%
+% For options.method = 'spb', the following fields are also returned: 
+% yboot  - 
+% psd    - 
 %
 % TODO:
 % - test for non-hourly data
@@ -94,18 +102,25 @@ function out = boot_tide(time,y,varargin)
 
 
 
+    % define the data structure with fields t, y, yhat, and yres
+    % and check the consistency of these variables
+    data = check_data(time,y,varargin);
 
 
-% defaine a data structure with fields t, y, yhat, and yres
-% and check the consistency of these variables
-data = check_data(time,y,varargin);
+    % set the bootstrap options based on default and user-defined values
+    boot_opt = set_options('boot',varargin);
+    boot_opt = check_boot_opt(data,boot_opt);
+
+    % intialize the output structure based on the input data and options
+    out = set_options('output',{'options',boot_opt, 'yhat',data.yhat, 'yres',data.yres});
 
 
-% set the bootstrap options
-boot_opt = set_options('boot',varargin);
-boot_opt = check_boot_opt(data,boot_opt);
-
-
+    % get the resamples (time indices and or simulated y)
+    if strcmpi(opt.method,'mbb')
+        [out.iboot,out.blocks] = get_mbb(data,boot_opt);
+    else
+        [out.yboot,out.psd] = get_spb(data,boot_opt);
+    end
 
 
 end

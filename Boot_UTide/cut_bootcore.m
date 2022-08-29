@@ -84,7 +84,7 @@ if strcmpi(bopt.mtd,'mbb')
 % %     I0rand = randi([1 ltin], expNbl,n_boot);
 % %    end
  
-% double the time vector to allow for circular bootstrap
+  % double the time vector to allow for circular bootstrap
   if bopt.circular
       tcirc = [tin(:); tin(:)];
       Ycirc = [Yres;Yres];

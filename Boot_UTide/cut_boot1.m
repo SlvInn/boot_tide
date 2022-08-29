@@ -16,7 +16,7 @@ caux = coef.aux;
 opt  = coef.aux.opt;
 
 
-% Bootstrap options >> Set defaults and read the ser-defined inputs
+% Bootstrap options >> Set defaults and read the user-defined inputs
 bopt = cut_bootinit(coef,tin,varargin{:});
 
 
@@ -66,7 +66,7 @@ else
 end
     
 % -- HARD-CODED NO INFERENCE: -- %
-assert(isempty(opt.infer),'inference constituent canÃ¨t be included, yet')
+assert(isempty(opt.infer),'inference constituent can t be included, yet')
 %    Q = []; 
 % beta = []; 
   nR = 0;
@@ -119,7 +119,7 @@ B = cut_BEFUV(t,caux.reftime,fakecnstit,opt,caux.lat,nt,nNR,nR,lor);
 % ------------------------------------- %
 %}
 
-% construct resample and re-estimate the parameters on each one
+% construct resamples and re-estimate the parameters on each one
 coef_boot = cut_bootcore(coef,tin,uvgd,B,Yres,Yhat,bopt,n_boot);
 %%% coef_boot = cut_bootcore_with_daniellspb(coef,tin,uvgd,B,Yres,Yhat,bopt,n_boot);
 

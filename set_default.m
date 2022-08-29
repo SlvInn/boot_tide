@@ -13,9 +13,14 @@ function defaults = set_default(function_name)
             defaults.circular    = false;       % use circular MBB or not
             defaults.lblock_dist = 'geom';      % default distribution (MATLAB name) for simulating the clock length
             defaults.lblock_par  = [];          % block length distribution parameter 
-            defaults.lblock      = 31;          % MBB block length 
+            defaults.lblock      = 31*24;       % MBB block length [h]
+
+        case {'out','output'}
+            defaults.options   = NaN;
+            defaults.yhat      = [];
+            defaults.yres      = [];   
 
         otherwise
-            error('set_default: unrecognized funtion_name');      
+            error('set_default: unrecognized function_name');      
     end
 end
