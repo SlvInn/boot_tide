@@ -22,6 +22,7 @@ switch opt.method
             m_boot = wB(iva,:)\(w(iva).*yboot(iva));
         else
             % re-estimate weights
+            disp(" re-estimate weights") %warning fatigant
                 iva = ~isnan(yboot);
             m_boot = robustfit(wB(iva,:),ctranspose(yboot(iva)),opt.method,opt.tunconst,'off');
         end

@@ -204,11 +204,8 @@ else
                for d = 1 : nDim
                    
                    rng(pbootseed(bs,d)) % set the seed
-<<<<<<< HEAD
-                   BootErr  = fftnoise_daniell(FTTres(:,d),1); % simulate a noise with same spectrum as the residuals
-=======
-                   BootErr  = noisecopy(validres(:,d),1); % simulate a noise with same spectrum as the residuals
->>>>>>> c4e9d54e9c63fa833110e157c9359e3978304faf
+                   BootErr  = fftnoise(FTTres(:,d),1);
+                %    BootErr  = noisecopy(validres(:,d),1); % simulate a noise with same spectrum as the residuals
                    Yboot(uvgd,d) = Yhat(uvgd,d) + BootErr ; % sum the simulated noise to the original reconstruction
                end
        
