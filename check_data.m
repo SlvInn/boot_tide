@@ -1,6 +1,7 @@
 function data = check_data(time,y,varargin)
-% apply basic check on input data
+% Apply basic check on input data
 %
+% INPUT:
 % time - Tx1 vector of arbitrary times [datenum UCT/GMT],
 %        It may include NaNs and time steps may be irregularly distributed 
 %  
@@ -15,6 +16,14 @@ function data = check_data(time,y,varargin)
 % 'yres', yres - TxS time series of resuduals (y-yhat) at the T time steps for S 
 %                spatial locations.
 %
+%
+% OUTPUT:
+% data - structure with fields       
+%        t    - Tx1 vector of times [datenum UCT/GMT]
+%        y    - TxS time series of observed water levels (T time steps, S locations)
+%        yhat - TxS time series of reconstructed water levels (T time steps, S locations)
+%        yres - TxS time series of residuals (T time steps, S locations)
+%        nloc = S num of spatial locations analyzed 
 %
 % S.Innocenti, silvia.innocenti@ec.gc.ca, 2022/07
         
@@ -51,7 +60,7 @@ data = paired_arguments(data, varargin);
 [ryh,cyh] = size(data.yhat);
 [rr,cr]   = size(data.yres);
 
-assert(ryh>0 || rr>0, 'at least one of yhat or yres  must be given in input')
+assert(ryh>0 || rr>0, 'at least one of yhat or yres (reconstructions or residuals) must be given in input')
 
 
 % if yhat in input

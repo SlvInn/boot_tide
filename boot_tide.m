@@ -1,7 +1,5 @@
 function out = boot_tide(time,y,varargin) 
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2020/04 - 2022/07
-% - test the code for hourly data in UTide and NS_Tide
-% - add the possibility of estimating a regression model?
 %
 % Construct residual bootstrap resamples given an or some observed series and 
 % a tidal reconstruction (e.g., tidal HA regression predictions)  
@@ -15,7 +13,7 @@ function out = boot_tide(time,y,varargin)
 %         the same time index resampling to conserve the spatial structure of
 %         data. y may include NaNs.
 % 
-%  {OPTIONS/VARARGIN} must contain at least one of the following pairs:
+% {OPTIONS/VARARGIN} must contain at least one of the following pairs:
 % 'yhat', yhat - TxS time series of reconstructed water levels at the T time steps for S 
 %                spatial locations.
 % 'yres', yres - TxS time series of resuduals (y-yhat) at the T time steps for S 
@@ -74,17 +72,27 @@ function out = boot_tide(time,y,varargin)
 %       to be used to construct the bootstrap resamples. Default: [] - Estimated by cut_reconstr1.m
 %
 %
+% 
+% OUTPUT:
+% out - 
 %
 %
-% NOTES % % % 
-% if working with irregular times, pay attention in setting the bootstrap
-% parameters  (check the block length, etc., since internal variables and 
-% scripts have only been tested for hourly data)
 %
 %
 % TODO:
-% - allow y to be a TxSx2 matrix for handling 2D currents
+% - test for non-hourly data
+% - test for hourly data in UTide and NS_Tide
 %
+% - allow y to be a TxSx2 matrix for handling 2D currents
+% - ?? add the possibility of estimating a regression model ???
+% 
+% % % ====== NOTES ===== % % % 
+% if working with irregular times, attention in setting the bootstrap
+% parameters (check the block length, etc., since internal variables and 
+% scripts have only been tested for hourly data)
+%
+
+
 
 
 
@@ -96,5 +104,8 @@ data = check_data(time,y,varargin);
 % set the bootstrap options
 boot_opt = set_options('boot',varargin);
 boot_opt = check_boot_opt(data,boot_opt);
+
+
+
 
 end

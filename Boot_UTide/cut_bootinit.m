@@ -168,10 +168,10 @@ end
 % assert(~(isempty(bopt.lBlk) &&  strcmpi(bopt.mtd,'mbb')), 'you must specify min-max block length (''blocklength'') for the MBB method with non-hourly data ') 
 
 if ~isempty(bopt.kyres)
-    assert( ~isempty(bopt.kyhat),'HA reconstruction are needed in input when using user-defined residuals')
+    assert( ~isempty(bopt.kyhat),'HA reconstructions needed in input when using user-defined residuals')
 end
 if ~isempty(bopt.kyhat)
-    assert( ~isempty(bopt.kyres),'known residuals are needed when providing user-defined HA reconstructions')
+    assert( ~isempty(bopt.kyres),'known residuals needed when providing user-defined HA reconstructions')
 end
 
 end

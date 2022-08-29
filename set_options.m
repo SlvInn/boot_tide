@@ -7,14 +7,14 @@ function options = set_options(function_name,varargin)
 % 2014-09-14, modified 2022-07-22
 % 
     % if we d'ont have optional inputs or the options are in a structure
-    if (nargin==1) || ~isstruct(varargin{1}) 
-        defaults = set_default(function_name);
+   if (nargin==1) || ~isstruct(varargin{1}) 
+      defaults = set_default(function_name);
         
     % if we already have a structure of options    
-    elseif isstruct(varargin{1})                              
-        defaults    = varargin{1};
-        varargin(1) = [];
-    end   
+   elseif isstruct(varargin{1})                              
+      defaults    = varargin{1};
+      varargin(1) = [];
+   end   
 
     
    if isempty(varargin)
@@ -25,8 +25,7 @@ function options = set_options(function_name,varargin)
 
 end
 
-
- function [options] = paired_arguments(options, paired_param)
+function options = paired_arguments(options, paired_param) %%% function [options] = paired_arguments(options, paired_param)
 % Update the strcucture with default parameters (options) 
 % with the user entered values (paired_param)
 % 
@@ -74,7 +73,5 @@ for i = 1:n
   % override the corresponding default in params
   options = setfield(options,p_i,v_i);
 end
-
-
 
 end
