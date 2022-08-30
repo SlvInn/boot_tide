@@ -1,7 +1,7 @@
-function data = check_data(time,y,varargin)
+function data = check_data(data)
 % Apply basic check on input data
 %
-% INPUT:
+% INPUT: data - struct with fields:
 % time - Tx1 vector of arbitrary times [datenum UCT/GMT],
 %        It may include NaNs and time steps may be irregularly distributed 
 %  
@@ -29,41 +29,15 @@ function data = check_data(time,y,varargin)
 % S.Innocenti, silvia.innocenti@ec.gc.ca, 2022/07
         
 % make time to be a col vector
-t  = time(:);
+t  = data.t;
 lt = length(t);
+y  = data.y;
 
 % get the observation matrix size
 [ry,cy] = size(y);
 
-% % if y is vector make it being a col vector
-% if ry==1 || cy==1 
-%     y  = y(:);
-%     ry = length(y);
-%     cy = 1;
-% end
-% % deleted since we don't allow yhat and yres being col vectors, for the moment
-
 % chekc time/y dim
 assert(lt==ry, 'inconsistent dimensions for time and y') 
-
-
-% define a data structure
-data.t      = t;   % time
-data.y      = y;   % observations
-data.yhat   = [];  % reconstructions
-data.yres   = [];  % residuals
-data.valid  = NaN; % index of valid data (non NaN time, observation, and residual values)
-data.tresol = 1;   % data temporal resolution [h]
-% data.lor  = NaN; % length of record based on valid time steps 
-% data.nloc = cy;  % num of spatial locations analyzed 
-
-
-
-% retrieve yhat and yres values
-data = paired_arguments(data, varargin);
-
-
-
 
 
 % check that at least a tidal reconstruction or the residuals are in input
@@ -119,7 +93,10 @@ end
 
 
 % compute valid data indices:
-data.valid = find(isfinite(data.t) & (data.t>=0) & isfinite(data.y) & isfinite(data.yhat));
-     
-    
+data.valid = isfinite(data.t) & (data.t>=0) & all(isfinite(data.y),2) & all(isfinite(data.yhat),2);
+% TODO: change the way of dealing with missing values > add the possibility of choosing valid time steps at 
+% all the locations or one location at time
+
+
+  
 end

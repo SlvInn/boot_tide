@@ -30,8 +30,9 @@ function out = boot_tide(time,y,varargin)
 %          'spb' for the Semi-Parametric Bootstrap based on the residual power spectrum.
 %           Default: 'mbb'.
 %
-%   !! NOTE !! only 'MBB' preserves the spatial consistency of the estimates at S locations,
-%           while 'SPB' ignores the spatial dependence of the residals. 
+%           !! NOTE !! only 'MBB' preserves the spatial consistency of the estimates at S locations,
+%                   while 'SPB' ignores the spatial dependence of the residals. However, when considering S 
+%                   locations, missing values in one series entail missing values at all other locations.
 %
 % 'circular', true/false  - boolean flag determining if a circular strategy 
 %           [Politis and Romano (1994)] must be used in constructing the resamples.
@@ -49,14 +50,14 @@ function out = boot_tide(time,y,varargin)
 %            * 'pois' - blocks with random lengths esimulated from a poisson distribution with 
 %                       parameter lambda = nhours (see 'lblock_par' definition below)
 %            * 'unif' - blocks with random lengths esimulated from an uniform distribution with 
-%                       parameters [a,b] = nhours (see 'lblock_par' definition below)
+%                       parameters [0,b] = nhours (see 'lblock_par' definition below)
 %
 % 'lblock_par', theta - block length distribution parameter(s) when using 
 %           random blocks MBB. Specifically, theta has the following interpretations:
 %            * inverse of the average block length for blockdist ='geom'. Default: 1/(30*24 +1) 
 %            * average block length for blockdist = 'pois'. Default: 30*24 
-%            * min and max block length for blockdist = 'unif' (i.e. nhours is a 2-element vector). 
-%            Default: [0,60*24], ignored when using SPB.  
+%            * max block length for blockdist = 'unif' (i.e. nhours is a 2-element vector). 
+%            Default: 60*24, ignored when using SPB.  
 %                      
 % 'lblock', nhours - block length [in hours] for fixed length block in MBB 
 %           Default: 30*24 + 1, ignored when using SPB.  
@@ -67,7 +68,7 @@ function out = boot_tide(time,y,varargin)
 %           random starts, while the second is used in the simulation of the block lengths.
 %           For the SPB, only the first seed is used to initialize the fttnoise function.      
 %     
-% 'spnoise', fname - name (string) of the ftt method or noise generating function to be used to 
+% 'noise', fname - name (string) of the ftt method or noise generating function to be used to 
 %            simulate semi-parametrically residual resamples with the same spectrum as the observed residuals. 
 %            Allowed values are:
 %               - 'fft'    | 'fftnoise': use the fftnoise.m function adapred by 
@@ -88,41 +89,46 @@ function out = boot_tide(time,y,varargin)
 %           for each replicate, yboot_b = yhay + yres(iboot(:,b),:), b = 1,2, ..., n_boot; yboot_b = (T x S) matrix
 % blocks - (nboot x 2) cell with the series of block lengths and block start indices for each bootstrap resample
 %
-%   !! NOTE !! iboot and blocks values apply to the S spatial locations to preserve the spatial dependence structure of residuals 
+%          !! NOTE !! iboot and blocks values apply to the S spatial locations to preserve the spatial structure of the residuals 
 %
 % For options.method = 'spb', the following fields are also returned: 
 % eboot   - (T x nboot x S) matrix of the simulated residuals at each spatial location (nboot x S 
 %            independent realizations of noise series of length T).
 % spectra - (T x S) matrix of the estimated residual spectrum at each spatial location.
 %
+%
 % TODO:
 % - test for non-hourly data
 % - test for hourly data in UTide and NS_Tide
+% - change the way of dealing with missing values > add the possibility of choosing valid time steps one location at time
 % - add the possibility of estimating a HA regression or other tidal models 
 % - add the computation of bootstrap statistics (estimators) and CI
 % - extend the account for the spatial dependece of S locations to the SPB  
 %
-%   !! NOTE !!   
-% If working with irregular times, attention in setting the bootstrap
+%
+%   
+% !! NOTE !! If working with irregular times, attention in setting the bootstrap
 % parameters (check the block length, etc., since internal variables and 
 % scripts have only been tested for hourly data)
 %
 
     % define the data structure with fields t, y, yhat, and yres
     % and check the consistency of these variables
-    data = check_data(time,y,varargin);
+
+    % % define a data structure with default fields and t,y
+    data = set_options('data',varargin{:},'t',time(:),'y',y);
+    data = check_data(data);
 
 
     % set the bootstrap options based on default and user-defined values
-    boot_opt = set_options('boot',varargin);
+    boot_opt = set_options('boot',varargin{:});
     boot_opt = check_boot_options(data,boot_opt);
-
+    
     % intialize the output structure based on the input data and options
-    out = set_options('output',{'options',boot_opt, 'yhat',data.yhat, 'yres',data.yres});
-
+    out = set_options('output','options',boot_opt, 'yhat',data.yhat, 'yres',data.yres);
 
     % get the resamples (time indices and or simulated y)
-    if strcmpi(opt.method,'mbb')
+    if strcmpi(boot_opt.method,'mbb')
         [out.iboot,out.blocks] = get_mbb(data,boot_opt);
     else
         [out.eboot,out.spectra] = get_spb(data,boot_opt);

@@ -12,17 +12,18 @@ function [eboot, eftt] = get_spb(data,opt)
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2022/08
 
     % time and residual vector without nan
-    t    = data.t(valid);
-    yres = data.yres(valid,:);
+    t    = data.t(data.valid);
+    yres = data.yres(data.valid,:);
+
 
     % number of spatial locations
     ns   = size(yres,2); 
-    if ns>1
-        warning(['SPB residuals are simulated independently at the ' num2str(ns) ' locations: spatial dependency is not accounted for in SPB'])
-    end
+    % if ns>1
+    %     warning(['SPB residuals are simulated independently at the ' num2str(ns) ' locations: spatial dependency is not accounted for in SPB'])
+    % end
 
     % n of resamples
-    nb = opt.nboot
+    nb = opt.nboot;
 
     % geenerate and store random seeds for each boot 
     rng(opt.seed(1))
@@ -32,9 +33,9 @@ function [eboot, eftt] = get_spb(data,opt)
     lt  = numel(data.t);
     teq = roundn(linspace(min(t), max(t), lt),-4); % rounded at the hour resolution
 
-    if ~isequal(teq,roundn(t,-4))
-        disp("** warning ** interpolating non-regularly spaced obs and/or missind data")
-    end
+    % if ~isequal(teq,roundn(t,-4))
+    %     disp("** warning ** interpolating non-regularly spaced obs and/or missind data")
+    % end
 
     % empty matrix for the residual FTT 
     eftt  = nan(lt,ns);
@@ -43,23 +44,23 @@ function [eboot, eftt] = get_spb(data,opt)
     for s = 1 : ns % for each spatial location
 
         % interpolate non-missing values over a regular time vector [to be changed]
-        yreseq = interp1(t,yres(:,s),teq,'pchip'); %'pchip',0
+        yreseq = interp1(t,yres(:,s),teq,'pchip',0); %'pchip'
 
         % generate nb random residuals based on the fft and store residual FFT
-        [eboot(:,:,s),eftt(:,s)] = get_spb_noise(y_residual,method,n_series)
+        [eboot(:,:,s),eftt(:,s)] = get_spb_noise(yreseq , opt.noise, nb);
 
     end
 end
 
 
 
-function [noise,f] = get_spb_noise(y_residual,method,n_series)
+function [noise,f] = get_spb_noise(y_residual,method,n_boot)
 % generate the spb residual resamples using one noise generator
 % INPUTS:
-%        x: time series (column vector).
-%   method: string indicating the noise generator (funtion) name,
-%           either fft, fftnoise, skfft, sknoise, cpfft, cpnoise, dllftt, or dllnoise. 
-% n_series: number of noise series to generate. 
+% y_residual: time series (column vector).
+%     method: string indicating the noise generator (funtion) name,
+%             either fft, fftnoise, skfft, sknoise, cpfft, cpnoise, dllftt, or dllnoise. 
+% n_boot: number of noise series to generate. 
 % 
 % OUTPUT:
 %  noise: simulated noise series with same power spectrum as f (each column is a resample).
@@ -67,13 +68,13 @@ function [noise,f] = get_spb_noise(y_residual,method,n_series)
     
     switch method
         case {'fft','fftnoise'}
-            [noise,f] = fftnoise(x,n_series);
+            [noise,f] = fftnoise(y_residual,n_boot);
         case {'skfft', 'sknoise', 'skewed'}    
-            [noise,f] = sknoise(x,n_series);
+            [noise,f] = sknoise(y_residual,n_boot);
         case {'cpfft', 'cpnoise'}
-            [noise,f] = cpnoise(x,n_series);
-        case {'dllftt', 'dllnoise', 'daniell'}    
-            [noise,f] = dllnoise(x,n_series);
+            [noise,f] = cpnoise(y_residual,n_boot);
+        case {'dllftt', 'dllnoise', 'daniell'}   
+            [noise,f] = dllnoise(y_residual, n_boot);
     end
 
 end
@@ -146,7 +147,8 @@ function  [noise,ff] = dllnoise(x,n_series)
         n_series=1;
     end
 
-    f  = f(:);
+    x  = x(:);  
+    f  = fft(x); 
     N  = length(f);
     Np = floor((N-1)/2);
 
@@ -261,8 +263,8 @@ function [noise,f] = cpnoise(series,n_series)
 % 
 % --->> Silvia Innocenti, adapted from rednoise.m - H. Zhivomirov  (2013)
 
-    series = series(:)
-    m = length(series)
+    series = series(:);
+    m = length(series);
 
     % define the length of the noise vector and ensure  
     % that M is even, this will simplify the processing
@@ -297,7 +299,7 @@ function [noise,f] = cpnoise(series,n_series)
         % manipulate the left half of the spectrum so the PSD
         % is proportional to the PSD of the observed series
         X = X(1:NumUniquePts);  
-        Xobs = f(1:NumUniquePts);  
+        Xobs = f(1:NumUniquePts)';  
         X = X.*Xobs;
 
         % prepare the right half of the spectrum - a conjugate copy of the left

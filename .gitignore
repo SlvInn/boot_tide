@@ -18,8 +18,8 @@
 *.sqlite
 
 # Test files and old#
-test*.
-_test.m
+test*
+*_test.m
 .tests_olds 
 *_old.py
 *_old

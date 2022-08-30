@@ -42,10 +42,7 @@ ind = get_out_cnstit_order(coef,opt);
         varcov_mCc = CoefDist.Sig.C;
     CoefDist.Sig.C = varcov_mCc(ind,:,:);
     end
-<<<<<<< HEAD
 
-=======
->>>>>>> c4e9d54e9c63fa833110e157c9359e3978304faf
 % (SI):  check for opt.twodim
 % --- %
 

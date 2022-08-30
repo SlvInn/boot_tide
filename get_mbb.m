@@ -9,18 +9,18 @@ function [iboot, blocks] = get_mbb(data,opt)
 % OUTPUT: 
 %  iboot  - (T x nboot) matrix of time indices to use for constructing the nboot resamples of y, i.e.,  
 %            such that yboot = yhay + yres(iboot,:)
-#  blocks - (nboot x 2) cell with the series of block lengths and block start indices for each bootstrap resample
+%  blocks - (nboot x 2) cell with the series of block lengths and block start indices for each bootstrap resample
 %
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2022/08
 
     % time and residual vector without nan
-    t    = data.t(valid);
+    t    = data.t(data.valid);
     lt   = numel(data.t);
-    yres = data.yres(valid,:);
+    yres = data.yres(data.valid,:);
     
 
-    # n of resamples
-    nb = opt.nboot 
+    % n of resamples
+    nb = opt.nboot; 
 
     % empties
     iboot  = nan(lt,nb);  % index 
@@ -33,12 +33,12 @@ function [iboot, blocks] = get_mbb(data,opt)
     % double the time vector abd the residual matrix to allow for circular bootstrap
     if opt.circular
         tc = [t(:); t(:)];
-        # yc = [yres;yres];
+        % yc = [yres;yres];
     else
         tc = t(:);
-        # yc = yres;
+        % yc = yres;
     end 
-
+    
     % construct the series of obs indices to select data in the resamples
     for b = 1 : nb
 
@@ -53,20 +53,20 @@ function [iboot, blocks] = get_mbb(data,opt)
             i0 = rand_i0(blk,b);     % random start of the blk-th block
             l  = rand_l_blk(blk,b);  % length of the blk-th block
 
-            tE = time_h(i0+l)/24;          % end time of the blk-th block [in days]
-            iE = find(tcirc<=tE,1,'last'); % index of the end time in the original series
+            tE = (time_h(i0)+l)/24;       % end time of the blk-th block [in days]
+            iE = find(tc<=tE,1,'last'); % index of the end time in the original series
             iE = max([iE,i0]);  
 
 
-          % tb  = [tb; tcirc(i0:iE)];    % attach the block of dates to tb
+          % tb  = [tb; tc(i0:iE)];    % attach the block of dates to tb
           lblk  = [lblk; numel(i0:iE)];  % record the length of the block  
           itb   = [itb; [i0:iE]'];       % attach the block of indices to itb
 
         end
 
         % eliminate exceeding indices and store the results in the output variables
-        iboot(:,b)  = itb(1:lt)
-        blocks{b,1} = lblk(:)
+        iboot(:,b)  = itb(1:lt);
+        blocks{b,1} = lblk(:);
         blocks{b,2} = rand_i0(1:blk,b);
     end
 
@@ -80,23 +80,27 @@ function [rl_blk, rand_i0, th] = mbb_block_lengths(t,tresol,opt)
     % length of the vector of valid time steps
     nt    = length(t);
 
-    nh   = 24/tresol;        % n of hours 
+    nh   = 24./tresol;        % n of hours 
     mt_h = round(min(t)*nh); % min time in hours: [days]*nh
     Mt_h = round(max(t)*nh); % max time in hours: [days]*nh
     th = (mt_h:1:Mt_h)';     % hourly time vector [h]
     lth = numel(th);         % N of hourly time steps
     
-    % simulate a larger number of possible block length values than needed (4 x expected num of blocks)
-    n_blocks = ceil(4*lth/opt.lblock_par) # we'll use only the first block length values
+    % number of possible block length values (more than needed)
+    if strcmp(opt.lblock_dist,'geom')
+     n_blocks = ceil(10*lth*opt.lblock_par);
+    else
+        n_blocks = ceil(10*lth./opt.lblock_par); % 10 x expected number of blocks 
+    end
 
     
-    rng(opt.seed(2)) # use the second random seed
-    switch opt.lBlk_dist
+    rng(opt.seed(2)) % use the second random seed
+    switch opt.lblock_dist
         case 'geom'
             rl_blk = geornd(opt.lblock_par, n_blocks, opt.nboot);
 
         case 'unif' 
-            rl_blk = randi(opt.lblock_par, n_blocks, opt.nboot);
+            rl_blk = randi([1 opt.lblock_par], n_blocks, opt.nboot);
           
         case 'pois' 
             rl_blk = poissrnd(opt.lblock_par-1, n_blocks, opt.nboot)+1;
@@ -104,8 +108,8 @@ function [rl_blk, rand_i0, th] = mbb_block_lengths(t,tresol,opt)
         case 'fix'
             rl_blk = repmat(opt.lblock_par, n_blocks, opt.nboot);
     end
-
+ 
     % simulate/draw random starts of the blocks
     rng(opt.seed(1))
-    rand_i0 = randi([1 nt], n_blocks, opt.nboot);
+    rand_i0 = randi(nt, n_blocks, opt.nboot);
 end

@@ -43,7 +43,7 @@ end
 arg  = paired_param;
 narg = length(arg);
 n    = narg/2;
-                                    
+
 if n~=floor(n)
    error 'Property/value pairs must come in pairs.'
 end
@@ -61,17 +61,26 @@ for i = 1:n
   if isempty(ind)
      ind = find(strncmp(p_i,lpropnames,length(p_i)));
      
-     if isempty(ind)
-        error(['No matching property found for: ', arg{2*i-1}])
-     elseif length(ind)>1
-        error(['Ambiguous property name: ', arg{2*i-1}])
-     end
+   % OLD:   
+   %   if isempty(ind)
+   %      error(['No matching property found for: ', arg{2*i-1}])
+   %   elseif length(ind)>1
+   %      error(['Ambiguous property name: ', arg{2*i-1}])
+   %   end
+
+   % NEW (we don't want to draw an error if a property not found):
+   if length(ind)>1
+      error(['Ambiguous property name: ', arg{2*i-1}])
+   end
      
   end
-  p_i = propnames{ind};
 
-  % override the corresponding default in params
-  options = setfield(options,p_i,v_i);
+  if ~isempty(ind) % NEW (we don't want to draw an error if a property not found)
+      p_i = propnames{ind};
+
+      % override the corresponding default in params
+      options = setfield(options,p_i,v_i);
+   end   
 end
 
 end
