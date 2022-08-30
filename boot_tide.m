@@ -115,7 +115,7 @@ function out = boot_tide(time,y,varargin)
 
     % set the bootstrap options based on default and user-defined values
     boot_opt = set_options('boot',varargin);
-    boot_opt = check_boot_opt(data,boot_opt);
+    boot_opt = check_boot_options(data,boot_opt);
 
     % intialize the output structure based on the input data and options
     out = set_options('output',{'options',boot_opt, 'yhat',data.yhat, 'yres',data.yres});
