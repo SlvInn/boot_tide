@@ -87,18 +87,18 @@ function opt = check_mbb_opt(data,opt)
 
 
     % remove the SPB options
-    % opt.psd = 'none';
-    opt = rmfield(opt,'psd')
+    opt = rmfield(opt,'spnoise')
 
 end
 
 
 function opt = check_spb_opt(data,opt)
 
-    legal_psd = {'ftt','daniell'};
+    legal_psd   = {'fft','fftnoise','skfft', 'sknoise', 'skewed','cpfft', 'cpnoise','dllftt', 'dllnoise', 'daniell'};
+    legal_names = {'fft','fftnoise','skfft', 'sknoise', 'cpfft', 'cpnoise','dllftt', 'dllnoise'};
 
     opt.spd = lower(opt.spd)
-    assert(any(strcmp(opt.spd,legal_psd)), ['Not a valid spd value for SPD, possible methods are ' legal_psd{:}])
+    assert(any(strcmp(opt.spd,legal_psd)), ['Not a valid spd value for SPD, possible methods are ' legal_names{:}])
 
 
     % % remove the block info from opt

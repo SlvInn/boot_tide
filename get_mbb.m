@@ -7,9 +7,9 @@ function [iboot, blocks] = get_mbb(data,opt)
 % opt   - structure with the bootstrap options >> See help boot_tide.m for a description of the opt structure fields 
 % 
 % OUTPUT: 
-%  iboot  - (T x nboot) matrix of time index to use for constructing the nboot resamples of y,  
-%         i.e., such that yboot = data.y(iboot,:)
-#  blocks - (nboot x 2) cell: for each bootstrap resample, series block lengths and block start indices
+%  iboot  - (T x nboot) matrix of time indices to use for constructing the nboot resamples of y, i.e.,  
+%            such that yboot = yhay + yres(iboot,:)
+#  blocks - (nboot x 2) cell with the series of block lengths and block start indices for each bootstrap resample
 %
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2022/08
 
