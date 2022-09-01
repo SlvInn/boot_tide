@@ -33,4 +33,4 @@ test*
 
 # SPECIFIC
 .DS_Store*
-.maybe.tmp.old./
+.maybe.tmp.old.
