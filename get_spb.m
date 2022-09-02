@@ -1,13 +1,14 @@
-function [eboot, eftt] = get_spb(data,opt)
+function out = get_spb(data,opt)
 % Get the simulated y resamples with the Semi-Parametric Bootstrap (SPB) method.
 %
 % INPUT:
 % data  - structure of processed data series   >> See help check_data
 % opt   - structure with the bootstrap options >> See help boot_tide.m for a description of the opt structure fields 
 % 
-% OUTPUT: 
-% eboot - (T x nboot x S) matrix of the nboot simulated resamples for each spatial location S
-% eftt  - (T x S) matrix of the estimated residual spectra
+% OUTPUT -  structure with (some of) the following fields:
+% res_ftt    - (T x S) matrix of the estimated residual spectra
+% y_boot     - (T x nboot x S) matrix of the nboot simulated resamples for each spatial location S
+% theta_boot - (P x nboot x S)  matrix of the nboot replicates of tide model parameters estimated on the resamples
 %
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2022/08
 
@@ -18,9 +19,6 @@ function [eboot, eftt] = get_spb(data,opt)
 
     % number of spatial locations
     ns   = size(yres,2); 
-    % if ns>1
-    %     warning(['SPB residuals are simulated independently at the ' num2str(ns) ' locations: spatial dependency is not accounted for in SPB'])
-    % end
 
     % n of resamples
     nb = opt.nboot;
@@ -33,26 +31,67 @@ function [eboot, eftt] = get_spb(data,opt)
     lt  = numel(data.t);
     teq = roundn(linspace(min(t), max(t), lt),-4); % rounded at the hour resolution
 
-    % if ~isequal(teq,roundn(t,-4))
-    %     disp("** warning ** interpolating non-regularly spaced obs and/or missind data")
-    % end
+    % define the size of the result structure 
+    if isfield(opt,'tide_model')
+        nout = numel(opt.theta); 
+    else
+        nout = lt;      
+    end
 
-    % empty matrix for the residual FTT 
-    eftt  = nan(lt,ns);
-    eboot = nan(lt,nb,ns);
-
-    for s = 1 : ns % for each spatial location
+    % empties
+    out.res_ftt = nan(lt,ns); % empty matrix for the residual FTT 
+    res = nan(nout,nb,ns); % empty matrix of y boot resamples or boot param
+    for s = 1 : ns % for each location 
 
         % interpolate non-missing values over a regular time vector [to be changed]
         yreseq = interp1(t,yres(:,s),teq,'pchip',0); %'pchip'
 
         % generate nb random residuals based on the fft and store residual FFT
-        [eboot(:,:,s),eftt(:,s)] = get_spb_noise(yreseq , opt.noise, nb);
+        [e_boot_s, out.res_ftt(:,s)] = get_spb_noise(yreseq , opt.noise, nb);
+        % TODO: verify the possibility of simulating all the series for nb >= 10^4 
+        % >> if not possible, break the get_spb_noise functions (using the fft in input)
 
+        % % for each resample, estimate the tidal parameters using opt.tide_model or get the yboot reconstr
+        res(:,:,s) = from_spb_res_to_out(data.yhat(:,s),e_boot_s, opt);
+        
+    end
+
+
+    % put the results in the relevant field of the out structure
+    if isfield(opt,'tide_model')
+        out.theta_boot = res;
+    else
+        out.y_boot = res;
+    end    
+
+end
+
+function out = from_spb_res_to_out(y,es,opt) 
+
+    nb = size(es,2);
+    if isfield(opt,'tide_model') % compute the parameters 
+       
+        % % for each resample, estimate the tidal parameters using opt.tide_model
+        for b = 1 : nb
+            yb = y + es(:,b);
+            out(:,b) = tide_model(yb);
+        end
+    else
+
+        % % get all the resamples of the original series
+        for b = 1 : nb
+            out(:,b) = y + es(:,b);
+        end
     end
 end
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%               NOISE GENERATORS                    %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Functions that generate noise series with same spectrum 
+% as an observed series x
 
 function [noise,f] = get_spb_noise(y_residual,method,n_boot)
 % generate the spb residual resamples using one noise generator
@@ -80,11 +119,7 @@ function [noise,f] = get_spb_noise(y_residual,method,n_boot)
 end
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%               NOISE GENERATORS                    %%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Functions that generate noise series with same spectrum 
-% as an observed series x
+
 
 function [noise,f] = fftnoise(x,n_series)
 % Generate noise with the same power spectrum as the observed x series.
@@ -198,7 +233,7 @@ function [noise,ff] = sknoise(x,n_series)
 
     % FFT
     x  = x(:);
-    ff  = fft(x);
+    ff = fft(x);
     N  = length(x);
 
 
@@ -231,6 +266,7 @@ function [noise,ff] = sknoise(x,n_series)
 
     % use the same fft for all simulations
     f  = repmat(ff,1,n_series);
+
 
     % frequency domain signal(s)             
     if rem(N, 2) %if even

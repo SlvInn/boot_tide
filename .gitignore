@@ -34,3 +34,7 @@ test*
 # SPECIFIC
 .DS_Store*
 .maybe.tmp.old.
+
+
+# data
+wl_default_resamples_100b.mat

@@ -1,4 +1,4 @@
-function [iboot, blocks] = get_mbb(data,opt)
+function out = get_mbb(data,opt)
 % Get the sequential indices to be used for constructing the y resamples
 % with the Moving Block Bootstrap (MBB) method.
 %
@@ -6,10 +6,11 @@ function [iboot, blocks] = get_mbb(data,opt)
 % data  - structure of processed data series   >> See help check_data
 % opt   - structure with the bootstrap options >> See help boot_tide.m for a description of the opt structure fields 
 % 
-% OUTPUT: 
-%  iboot  - (T x nboot) matrix of time indices to use for constructing the nboot resamples of y, i.e.,  
-%            such that yboot = yhay + yres(iboot,:)
-%  blocks - (nboot x 2) cell with the series of block lengths and block start indices for each bootstrap resample
+% OUTPUT -  structure with (some of) the following fields:
+% i_boot     - (T x nboot) matrix of time indices to use for constructing the nboot resamples of y [i.e., s.t. y_boot = yhay + yres(i_boot,:,:)]
+% blocks     - (nboot x 2) cell with the series of block lengths and block start indices for each bootstrap resample
+% y_boot     - (T x nboot x S) matrix of the nboot simulated resamples for each spatial location S
+% theta_boot - (P x nboot x S)  matrix of the nboot replicates of tide model parameters estimated on the resamples
 %
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2022/08
 
@@ -17,26 +18,32 @@ function [iboot, blocks] = get_mbb(data,opt)
     t    = data.t(data.valid);
     lt   = numel(data.t);
     yres = data.yres(data.valid,:);
-    
+    ns = size(yres,2);
 
     % n of resamples
     nb = opt.nboot; 
 
+
+    % define the size of the result structure 
+    if isfield(opt,'tide_model')
+        nout = numel(opt.theta); 
+    else
+        nout = lt;  
+    end  
+
     % empties
-    iboot  = nan(lt,nb);  % index 
+    i_boot  = nan(lt,nb);  % index 
     blocks = cell(nb,2);  % index of the start time and length of each block of each bootstrap resample
-    
+    res = nan(nout,nb,ns); % empty matrix of y boot resamples or boot param
 
     % simulate the block lengths (if random blocks, otherwise repeat the fix length) and the random starts of the blocks:
     [rand_l_blk, rand_i0, time_h] = mbb_block_lengths(t,data.tresol,opt);
 
-    % double the time vector abd the residual matrix to allow for circular bootstrap
+    % double the time vector to allow for circular bootstrap
     if opt.circular
         tc = [t(:); t(:)];
-        % yc = [yres;yres];
     else
         tc = t(:);
-        % yc = yres;
     end 
     
     % construct the series of obs indices to select data in the resamples
@@ -65,11 +72,25 @@ function [iboot, blocks] = get_mbb(data,opt)
         end
 
         % eliminate exceeding indices and store the results in the output variables
-        iboot(:,b)  = itb(1:lt);
+        i_boot(:,b) = itb(1:lt);
         blocks{b,1} = lblk(:);
         blocks{b,2} = rand_i0(1:blk,b);
+        res(:,b,:)  = from_mbb_res_to_out(data,i_boot(:,b),opt);
     end
 
+
+    % add the block construction infor to the output structure, if requested
+    if opt.block_output
+        out.i_boot = i_boot;
+        out.blocks = blocks;
+    end    
+
+    % put the results in the relevant field of the out structure
+    if isfield(opt,'tide_model')
+        out.theta_boot = res;
+    else
+        out.y_boot = res;
+    end
 
 end 
 
@@ -112,4 +133,32 @@ function [rl_blk, rand_i0, th] = mbb_block_lengths(t,tresol,opt)
     % simulate/draw random starts of the blocks
     rng(opt.seed(1))
     rand_i0 = randi(nt, n_blocks, opt.nboot);
+end
+
+
+
+
+function out = from_mbb_res_to_out(data,ib,opt) 
+% TODO: check if this funtion works with varous locations because the tidal model shoudl be the same at all locations
+
+    % reconstruction and resampled residuals
+    y  = data.yhat;
+    ns = size(y,2);
+    eb = data.yres(ib,:);
+
+
+    if isfield(opt,'tide_model') % compute the parameters 
+        
+        
+        % % for each resample, estimate the tidal parameters using opt.tide_model
+        for s = 1 : ns
+            yb = y(:,s) + eb(:,s);
+            out(:,s) = tide_model(yb)
+        end
+    else
+
+        % % get all the resamples of the original series
+        out = y + eb;
+        
+    end
 end

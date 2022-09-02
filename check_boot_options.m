@@ -23,9 +23,27 @@ function opt = check_boot_options(data,opt)
     
     if strcmp(opt.method,'mbb') % check options for the MBB
         opt = check_mbb_opt(data,opt);
+
+        if opt.block_output>1
+            warning('boot_tide:check_boot_options >> block_output>1 set to false')
+            opt.block_output = logical(opt.block_output==true || opt.block_output<=1);
+        end
+        
+
     else % check options for SPB
         opt = check_spb_opt(data,opt);  
     end    
+
+    % check that tide_model is a funtion handle or empty
+    if ~isempty((opt.tide_model))
+        assert(class(opt.tide_model),'tide_model must be a function handle')
+        assert(nargin(opt.tide_model)==1,'tide_model can only take 1 input argument (observation vector)')
+        assert(~isempty((opt.theta)), 'theta must be provided for non empty tide_model')
+        opt.theta = opt.theta(:); %make theta being a col vector
+
+    else
+        opt = rmfield(opt,{'tide_model','theta'});     
+    end
 
 end
 
@@ -40,7 +58,8 @@ function opt = check_mbb_opt(data,opt)
     % MBB (fix) block length
     assert(numel(opt.lblock)==1 && opt.lblock>1,'lblock must be a number >1 [N of hours]')
 
-    dt = nanmax(data.t) - nanmin(data.t); % [days]
+    dt = nanmax(data.t) - nanmin(data.t);  % need the statistics toolbox
+    % dt = max(data.t(~isnan(data.t))) - min(data.t(~isnan(data.t))); % [days]
     if opt.lblock > 0.1*(dt*24) % the block length must be at least 1/10 of series length in hours
         warning('check_boot_opt: block length greater than 1/10 of the observed time period')
     end
@@ -102,6 +121,6 @@ function opt = check_spb_opt(data,opt)
 
 
     % % remove the block info from opt
-    opt = rmfield(opt,{'lblock','lblock_par','lblock_dist','circular'});
+    opt = rmfield(opt,{'lblock','lblock_par','lblock_dist','circular','block_output'});
 
 end
