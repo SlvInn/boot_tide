@@ -74,7 +74,7 @@ function out = from_spb_res_to_out(y,es,opt)
         % % for each resample, estimate the tidal parameters using opt.tide_model
         for b = 1 : nb
             yb = y + es(:,b);
-            out(:,b) = tide_model(yb);
+            out(:,b) = opt.tide_model(yb);
         end
     else
 

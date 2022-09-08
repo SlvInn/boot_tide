@@ -31,12 +31,12 @@ function opt = check_boot_options(data,opt)
         
 
     else % check options for SPB
-        opt = check_spb_opt(data,opt);  
+        opt = check_spb_opt(opt);  
     end    
 
     % check that tide_model is a funtion handle or empty
     if ~isempty((opt.tide_model))
-        assert(class(opt.tide_model),'tide_model must be a function handle')
+        assert(strcmp(class(opt.tide_model),'function_handle'),'tide_model must be a function handle')
         assert(nargin(opt.tide_model)==1,'tide_model can only take 1 input argument (observation vector)')
         assert(~isempty((opt.theta)), 'theta must be provided for non empty tide_model')
         opt.theta = opt.theta(:); %make theta being a col vector
@@ -98,7 +98,7 @@ function opt = check_mbb_opt(data,opt)
                 assert(numel(opt.lblock_par)==1,'MBB block length parameter (poisson distribution) must be a scalar (mean block length)') 
             case 'fix'
                 assert(numel(opt.lblock_par)==1,'MBB block length must be a scalar')
-                assert(~isnan(opt.lblock_par),"block length cannot be NaN for fix length MBB")
+                assert(~isnan(opt.lblock_par),'block length cannot be NaN for fix length MBB')
                 assert(opt.lblock_par>1 && opt.lblock_par<opt.lblock_par,'MBB Block length must be in (1,T]')
         end
 
@@ -111,14 +111,16 @@ function opt = check_mbb_opt(data,opt)
 end
 
 
-function opt = check_spb_opt(data,opt)
+function opt = check_spb_opt(opt)
 
     legal_psd   = {'fft','fftnoise','skfft', 'sknoise', 'skewed','cpfft', 'cpnoise','dllftt', 'dllnoise', 'daniell'};
     legal_names = {'fft','fftnoise','skfft', 'sknoise', 'cpfft', 'cpnoise','dllftt', 'dllnoise'};
 
     opt.noise = lower(opt.noise);
     assert(any(strcmp(opt.noise,legal_psd)), ['Not a valid noise value for SPD, possible methods are ' legal_names{:}])
-
+    if ~any(strcmp(opt.noise,{'fft','fftnoise'}))
+        warning([opt.noise ' SPB presently deprecated > use the ftt option instead'])
+    end
 
     % % remove the block info from opt
     opt = rmfield(opt,{'lblock','lblock_par','lblock_dist','circular','block_output'});

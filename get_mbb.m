@@ -75,7 +75,8 @@ function out = get_mbb(data,opt)
         i_boot(:,b) = itb(1:lt);
         blocks{b,1} = lblk(:);
         blocks{b,2} = rand_i0(1:blk,b);
-        res(:,b,:)  = from_mbb_res_to_out(data,i_boot(:,b),opt);
+        res(:,b,:) = from_mbb_res_to_out(data,i_boot(:,b),opt);
+
     end
 
 
@@ -145,15 +146,15 @@ function out = from_mbb_res_to_out(data,ib,opt)
     y  = data.yhat;
     ns = size(y,2);
     eb = data.yres(ib,:);
+     
 
 
     if isfield(opt,'tide_model') % compute the parameters 
         
-        
         % % for each resample, estimate the tidal parameters using opt.tide_model
         for s = 1 : ns
             yb = y(:,s) + eb(:,s);
-            out(:,s) = tide_model(yb)
+            out(:,s) = opt.tide_model(yb);
         end
     else
 

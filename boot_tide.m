@@ -8,14 +8,14 @@ function out = boot_tide(time,y,varargin)
 %         It may include NaNs and time steps may be irregularly distributed. 
 %  
 % y     - TxS time series of observed water levels at the T time steps for S 
-%         spatial locations. If S>1 all resamples will be constructed using
+%         spatial locations. If S>1, all resamples will be constructed using
 %         the same time index resampling to conserve the spatial structure of
 %         data. y may include NaNs.
 % 
 % {OPTIONS/VARARGIN} must contain at least one of the following pairs:
 % 'yhat', yhat - TxS time series of reconstructed water levels at the T time steps for S 
 %                spatial locations. yhat must be s.t. yhat = y - yres
-% 'yres', yres - TxS time series of resuduals (y-yhat) at the T time steps for S 
+% 'yres', yres - TxS time series of residuals (y-yhat) at the T time steps for S 
 %                spatial locations. yres must be s.t. yres = y - yhat
 %
 %
@@ -69,15 +69,6 @@ function out = boot_tide(time,y,varargin)
 %           resampling. For MBB, the first seed is used in the simulation of the block 
 %           random starts, while the second is used in the simulation of the block lengths.
 %           For the SPB, only the first seed is used to initialize the fttnoise function.      
-%     
-% 'noise', fname - name (string) of the ftt method or noise generating function to be used to 
-%            simulate semi-parametrically residual resamples with the same spectrum as the observed residuals. 
-%            Allowed values are:
-%               - 'fft'    | 'fftnoise': use the fftnoise.m function adapred by 
-%               - 'skfft'  | 'sknoise'  | 'skewed': use the sknoise.m function 
-%               - 'cpfft'  | 'cpnoise': use the cpnoise.m function 
-%               - 'dllftt' | 'dllnoise' | 'daniell': use the dllnoise.m function 
-%            >> See get_spb_noise.m for a detailed description of each function. 
 %          
 % 'tide_model', @(x) tide_model(x) - function handle returning an estimate (vector) of tidal parameters for a given vector
 %                      of water level observations. If provided, boot_tide.m would return an estimate of the tidal parameters 
@@ -89,6 +80,18 @@ function out = boot_tide(time,y,varargin)
 %
 % 'theta_circ', bool - Px1 vector of boolean values indicating which theta components are circular variables (e.g., phases).
 %                      Default: [true for each theta],  if 'tide_model' and 'theta' are provided                 
+%
+%
+% EXPERIMENTAL OPTIONS (presently deprecated, need more tests)
+% 'noise', fname - name (string) of the ftt method (noise generating function) to be used to 
+%            simulate semi-parametrically residual resamples with the same spectrum as the observed residuals. 
+%            Allowed values are:
+%               - 'fft'    | 'fftnoise': use the fftnoise.m function  >> Default: it is the only option that don't print a warning at screen
+%               - 'skfft'  | 'sknoise'  | 'skewed': use the sknoise.m function 
+%               - 'cpfft'  | 'cpnoise': use the cpnoise.m function 
+%               - 'dllftt' | 'dllnoise' | 'daniell': use the dllnoise.m function 
+%            >> See get_spb_noise.m for a detailed description of each function. 
+%
 %
 % OUTPUT >> structure with fields:
 % yhat       - original water level reconstructions: yhat = y- yres. 
@@ -114,7 +117,6 @@ function out = boot_tide(time,y,varargin)
 % - test for hourly data in UTide and NS_Tide
 % - test works if the estimation at multiple location works when prescribing a tidal_model: the model must be the same funtion handle at all locations
 % - change the way of dealing with missing values > add the possibility of choosing valid time steps one location at time
-% - add the computation of bootstrap statistics (estimators) and CI
 % - change the SPB to account for the spatial dependece of S locations 
 %
 %   

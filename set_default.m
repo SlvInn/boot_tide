@@ -41,10 +41,10 @@ function defaults = set_default(function_name)
 
         case 'boot_param'
 
-            defaults.circular   = [];          % vector indicating which compontent of theta are circural variables (e.g., phases)  
-            defaults.circ_units = 'rad';       % units of circular parameters: 'rad', 'radians', 'deg', or 'degrees'
-            defaults.ci_method = 'percentile' % string indicating the confidence interval method to use: 'percentile', 'gaussian', 'accelerated', 'bca'
-            defaults.alpha      = 0.05;        % confidence level for constructing CI
+            defaults.circular   = [];           % vector indicating which compontent of theta are circural variables (e.g., phases)  
+            defaults.circ_units = 'rad';        % units of circular parameters: 'rad', 'radians', 'deg', or 'degrees'
+            defaults.ci         = 'percentile'; % string indicating the confidence interval method to use: 'percentile', 'gaussian', 'accelerated', 'bca'
+            defaults.alpha      = 0.05;         % confidence level for constructing CI
  
         otherwise
             error('set_default: unrecognized function_name');      

@@ -1,8 +1,7 @@
 % ex0_estimate_ha_on_obs.m
-% matlab -nodisplay -batch ex0_estimate_ha_on_obs.m
 % 
 % Apply UTide harmonic analysis to get water level reconstructions 
-% for next exxemples.
+% for next exemples.
 % Note: aux() is a function container used to store miscellaneaous functions in aux.m
 %
 % silvia.innocenti@ec.gc.ca, 2022/08/30. 
@@ -10,6 +9,7 @@
 clc
 clear
 
+% hidden folder with adapted UTide code
 addpath('../.boot_UTide./')
 
 % fix the period
@@ -18,6 +18,7 @@ te = datenum(2000,12,31,23,0,0); % date end
 
 % load data at 2 stations 
 stations = {'Halifax', 'St.Francois'};
+     sta = {'hal', 'stf'};
       ns = length(stations);
    coord = [47.000252, -70.808219; 44.666667, -63.583333;];
 
@@ -41,7 +42,7 @@ cfstats = cell(2,1);
 
 
 % solve at station 1 
-[cf,cfstats]   = cut_solv(t,hobs(:,1),[],coord(1,1),'auto',optut{:});
+[cf,~]   = cut_solv(t,hobs(:,1),[],coord(1,1),'auto',optut{:});
 
 % reconstruction
 cf.boot_opt.aux   = cf.aux;
@@ -51,8 +52,10 @@ cf.boot_opt.aux   = cf.aux;
 var2save = {'t','h','B','cf','optut'};
 save('./data/hhat_HAL_2000.mat',var2save{:})
 
+
+
 % solve at station 2 
-[cf,cfstats]   = cut_solv(t,hobs(:,2),[],coord(2,1),'auto',optut{:});
+[cf,~]  = cut_solv(t,hobs(:,2),[],coord(2,1),'auto',optut{:});
 
 % reconstruction
 cf.boot_opt.aux   = cf.aux;
@@ -60,4 +63,5 @@ cf.boot_opt.aux   = cf.aux;
 
 % save data
 save('./data/hhat_STF_2000.mat',var2save{:})
+
 

@@ -1,3 +1,6 @@
+% Load water level data for two stations and the corresponding harmonic analysis 
+% Note: aux() is a function container used to store miscellaneaous (sub)-functions in aux.m
+
 addpath('../')
 
 % fix the period
@@ -13,5 +16,17 @@ nS = length(stations);
 [h(:,2),~] = aux('read_hourly_data','./data/hobs_STF_1999_2009.mat',t0,te); % water level @ St.Francois
 
 % load some reconstructions at these two stations (from HA)
-[hhat(:,1),t] = aux('read_hourly_data','./data/hhat_HAL_2000.mat',t0,te); % estimated water level and time @ Halifax
-[hhat(:,2),~] = aux('read_hourly_data','./data/hhat_STF_2000.mat',t0,te); % estimated water level @ St.Francois
+[hhat(:,1),that] = aux('read_hourly_data','./data/hhat_HAL_2000.mat',t0,te); % estimated water level and time @ Halifax
+[hhat(:,2),~] = aux('read_hourly_data','./data/hhat_STF_2000.mat',t0,te);  % estimated water level @ St.Francois
+
+
+% load the classical HA 
+load('./data/hhat_HAL_2000.mat','cf','B')
+coef.hal = cf;
+coef.hal.B = B;
+clear B cf
+
+load('./data/hhat_STF_2000.mat','cf','B')
+coef.stf = cf;
+coef.stf.B = B;
+clear B cf 
