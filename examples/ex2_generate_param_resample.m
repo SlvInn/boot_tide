@@ -11,7 +11,7 @@ clc; clear
 r2_load_halifax_station
 
 % use a low nboot value to have faster calculations in tests
-nboot = 10^3; 
+nboot = 500; 
 
 
 % some quantities estimated on the original water level sample 
@@ -23,7 +23,7 @@ nboot = 10^3;
 tidemdl = @(y) (w(~isnan(y)).*B1(~isnan(y),:)) \ (w(~isnan(y)).*y(~isnan(y))); 
 
 % construct the resamples
-%{
+%
 % put common parameters together
 boot_opt = {'yhat',hhat,'nboot',nboot,'tide_model',tidemdl,'theta',theta};
 
@@ -76,7 +76,7 @@ for i = 1:nMtd
     
     % estimate the boot stats for the amplitudes
     [mA,sA, ciA] = boot_tide_param(out.(mtd{i}).a_boot);
-    theta_boot.(mtd{i}).avg.A     = mA;
+    theta_boot.(mtd{i}).avg.A = mA;
     theta_boot.(mtd{i}).std.A = sA;
     theta_boot.(mtd{i}).ci.A  = ciA;
     

@@ -75,6 +75,8 @@ function out = get_mbb(data,opt)
         i_boot(:,b) = itb(1:lt);
         blocks{b,1} = lblk(:);
         blocks{b,2} = rand_i0(1:blk,b);
+
+        % contruct the resamples of the water levels or residuals
         res(:,b,:) = from_mbb_res_to_out(data,i_boot(:,b),opt);
 
     end

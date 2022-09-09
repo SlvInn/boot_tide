@@ -10,12 +10,12 @@ clc; clear
 r1_load_stations
 
 % use a low nboot value to have faster calculations in tests
-nboot = 10^3; 
+nboot = 1000; 
 
 
 
 % compute bootstrap resamples
-%{
+%
 
 % % % apply boot_tide MBB with defaults values, except nboot and the
 % % % distribution of the block length 
@@ -103,11 +103,11 @@ for i = 1:nMtd
     end
 end
 legend(pl(1,:),mtd{:}); % add the method names in the legend
-
+print(fig,'-dpdf',[FldOutGr '\gr1_wat_lev_mean'],'-fillpage') 
 
 
 % construct graphics for the width of water level ci estimated over a short period (one week)
-fig = figure; % def a figure obj
+fig = figure('visible','off'); % def a figure obj
 
 for i = 1:nMtd
          
@@ -126,3 +126,5 @@ for i = 1:nMtd
     end
 end
 legend(pl(1,:),mtd{:}); % add the method names in the legend
+print(fig,'-dpdf',[FldOutGr '\gr1_wat_lev_ci'],'-fillpage') 
+close all
