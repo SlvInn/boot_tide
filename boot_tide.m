@@ -51,7 +51,7 @@ function out = boot_tide(time,y,varargin)
 %            * 'unif' - blocks with random lengths esimulated from an uniform distribution with 
 %                       parameters [0,b] = nhours (see 'lblock_par' definition below)
 %
-% 'lblock_par', theta - block length distribution parameter(s) when using 
+% 'lblock_par', lblkpar - block length distribution parameter(s) when using 
 %           random blocks MBB. Specifically, theta has the following interpretations:
 %            * inverse of the average block length for blockdist ='geom'. Default: 1/(30*24 +1) 
 %            * max block length for blockdist = 'unif' (i.e. nhours is a 2-element vector). 
@@ -74,13 +74,7 @@ function out = boot_tide(time,y,varargin)
 %                      of water level observations. If provided, boot_tide.m would return an estimate of the tidal parameters 
 %                      for each bootstrap resample. Default: [] (no parameter estimate is made on the bootstrap resamples).
 %                      NOTE: if 'tide_model' is provided, 'theta' is also needed (see below) 
-%
-% 'theta', theta - Px1 vector of parameter estimated on the observed sample [i.e., theta = tide_model(y)] used 
-%                  to check the tide_model output and for computing the bootstrap estimates of the tide_model parameters.
-%
-% 'theta_circ', bool - Px1 vector of boolean values indicating which theta components are circular variables (e.g., phases).
-%                      Default: [true for each theta],  if 'tide_model' and 'theta' are provided                 
-%
+%  
 %
 % EXPERIMENTAL OPTIONS (presently deprecated, need more tests):
 % 'noise', fname - name (string) of the ftt method (noise generating function) to be used to 
@@ -153,3 +147,10 @@ function out = boot_tide(time,y,varargin)
     end
 
 end
+
+% OLD / UNUSED OPT:
+% 'theta', theta - Px1 vector of parameter estimated on the observed sample [i.e., theta = tide_model(y)] used 
+%                  to check the tide_model output and for computing the bootstrap estimates of the tide_model parameters.              
+%
+% 'theta_circ', bool - Px1 vector of boolean values indicating which theta components are circular variables (e.g., phases).
+%                      Default: [true for each theta],  if 'tide_model' and 'theta' are provided 

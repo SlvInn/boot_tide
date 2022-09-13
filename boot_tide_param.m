@@ -18,7 +18,7 @@ function [m_theta, s_theta,  ci_theta,  opt] = boot_tide_param(theta,varargin)
 % circ_units - 'radians' or 'degrees' indicating the units of the circular components of theta. 
 %               Default: 'radians.
 %
-% ci_method  - string indicating the method for compunting the Confidence Interval (CI) of non-circular theta.
+% ci         - string indicating the method for compunting the Confidence Interval (CI) of non-circular theta.
 %              Possible values: 
 %                   * 'percentile'  - percentile bootstrap CI: [theta_alpha/2, theta_1-alpha/2]
 %                   * 'gaussian'    - gaussian approximation of CIs: [mean_theta +- z_alpha/2 * sigma_theta]
