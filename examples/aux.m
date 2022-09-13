@@ -63,10 +63,29 @@ end
 
 
 
-function pl = plot_amplitudes(amp,comp,freq,ticks, varargin)
+function pl = plot_amplitudes(amp,comp,freq, varargin)
+
+
+% check if the plot must set the tick style
+if any(strcmpi(varargin,'ticks'))
+    id = find(strcmpi(varargin,'ticks'));
+    ticks = varargin{id+1};
+    varargin(id:id+1) = [];
+else
+    ticks = true;
+end
+
+% check if the plot must be staicase
+if any(strcmpi(varargin,'staircase'))
+    id = find(strcmpi(varargin,'staircase'));
+    staircase = varargin{id+1};
+    varargin(id:id+1) = [];
+else
+    staircase = true;
+end
 
 % make the amp beaing a column vect
-amp  = amp(:);
+  amp  = amp(:);
 
 % No of constituents
  nc  = length(amp);
@@ -99,7 +118,12 @@ end
    
  % use a stair function for showing values at each frequency 
  x = repmat(amp',3,1);
- x = x(:);
+ if staircase==false
+        x(1,:) = NaN;
+        x(3,:) = NaN;
+ end
+ 
+  x = x(:);
 pl = plot(box_tk,x,varargin{:});
 
 
