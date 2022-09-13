@@ -32,10 +32,28 @@ This function implements the MBB and SPB algorithms (`method` option) to generat
     out = boot_tide(time, y, {'option_name',option_value})
 ```
 
+general options: 
+- `n_boot`: number of bootstrap resample to generate
+- `seed`: pseudo-numebr generator seed: generate an odd number as seed  
+- `method`: bootstrap type: MBB or SPB
+
+options for MBB only:
+- `circular`: if true use circular MBB 
+- `lblock_dist`: distribution (MATLAB name) for simulating the block length
+- `lblock_par`: block length distribution parameter
+- `lblock`: MBB block length [in hours] 
+- `block_output`: if true return the MBB matrices used for construction the resamples (e.g., time indices)
+
+options for SPB only (EXPERIMENTAL):
+- `noise`: method to estimate the residual spectrum: fft, fftnoise, skfft, sknoise, cpfft, cpnoise, dllftt, or dllnoise
+
+option for computing the parameter resamples: 
+- `tide_model`: function handle for estimating the tidal parameters on each y resample 
+
+
 ### boot_tide_param.m
 Calculate the plug-in bootstrap estimators of the parameter replicates of a tidal model (not necessarily produced via `boot_tide.m`, it only needs a matrix of parameters replicates) and the corresponding Confidence Intervals (CIs). 
 Via the specification of the `circular` option, the user can request to use circular statistics for the parameters expressed in radiant or degrees units [e.g., tidal phases]. 
-
 
 ```MATLAB
     % bootstrap estimate of the paramemeters (bootstrap distribution means)
@@ -48,3 +66,9 @@ Via the specification of the `circular` option, the user can request to use circ
     [m_theta,s_theta,ci_theta]  = boot_tide_param(theta, {'option_name',option_value})
 ```
 
+general options: 
+- `circular`: vector indicating which compontent of theta are circural variables (e.g., phases)  
+- `circ_units`: units of circular parameters: 'radians' or 'degrees'
+- `ci`: method for computing the parameter CI: 'percentile', 'gaussian', or 'studentized'
+- `alpha`: CI confidence level
+- `theta0`: vector of paramaters computed on the ortiginal samples (used for studentizzed boot CI)
