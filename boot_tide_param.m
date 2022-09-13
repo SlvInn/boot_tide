@@ -1,9 +1,17 @@
 function [m_theta, s_theta,  ci_theta,  opt] = boot_tide_param(theta,varargin) 
-% Estimate plug-in bootstrap estimators of the tidall model parameter replicates.
+% Compute the plug-in bootstrap estimators of the tidal model parameter replicates, 
+% allowing for the use of circular statistics for (some) parameters (i.e. theta rows). 
+%
+%     [m_theta]  = boot_tide_param(theta, {'option_name',option_value}) 
+%     [m_theta,s_theta]  = boot_tide_param(theta, {'option_name',option_value})
+%     [m_theta,s_theta,ci_theta]  = boot_tide_param(theta, {'option_name',option_value})
+%     [m_theta,s_theta,ci_theta,opt]  = boot_tide_param(theta, {'option_name',option_value})
 %
 % INPUT:
-% theta      - (P x nboot x S) matrix of the nboot replicates of tide model parameters.
+% theta - (P x nboot x S) matrix of the nboot replicates of tide model parameters.
 %
+%
+% VARARGIN >> {'option_name',option_value}: 
 % circular   - (P x 1) vector indicating which theta components are angles (e.g., phases)
 %               Default: [false for each theta].
 %
@@ -13,18 +21,19 @@ function [m_theta, s_theta,  ci_theta,  opt] = boot_tide_param(theta,varargin)
 % ci_method  - string indicating the method for compunting the Confidence Interval (CI) of non-circular theta.
 %              Possible values: 
 %                   * 'percentile'  - percentile bootstrap CI: [theta_alpha/2, theta_1-alpha/2]
-%                   * 'gaussian'    - gaussian approximation of CI: [mean_theta +- z_alpha/2 * sigma_theta]
-%                   * 'accelerated' - Accelerated bootstrap (not ready yet)
-%                   * 'bca'         - Bias-Correct Accelerated bootstrap (not ready yet)
+%                   * 'gaussian'    - gaussian approximation of CIs: [mean_theta +- z_alpha/2 * sigma_theta]
+%                   * 'studentized' - Studentized bootstrap CI: ...
+%                   * 'accelerated' - Accelerated bootstrap CI (not ready yet)
+%                   * 'bca'         - Bias-Correct Accelerated bootstrap CI (not ready yet)   
 %              Default: 'percentile'.  
 %              
 % alpha      - confidence level for constructing CI. Default: 0.05
 % 
-%
-%
-% {OPTIONS/VARARGIN}:
+% theta0     - (P x S) matrix of the original tide model parameters (i.e. parameters computed on 
+%              the original data sample, not the bootstrap replicates).  theta0 is mandatory for  
+%              computing studentized bootstrap CIs, and ignored by all other CI methods.
 % 
-% OUTPUT:
+% OUTPUT: 
 % m_theta - (P x S) matrix of the parameter mean overt the nboot replicates.
 %           circular mean calculated from circ_mean.m are returned for circular parameters.
 %
@@ -71,7 +80,6 @@ function [m_theta, s_theta,  ci_theta,  opt] = boot_tide_param(theta,varargin)
     % mean 
     m_theta = mean_theta(theta,lin,cir); 
 
-    
 
     % variance
     if nargout > 1
@@ -145,9 +153,9 @@ end
 
 function ci_theta =  mean_theta_ci(theta,m_theta,s_theta,lin,cir,opt)
 
-    % empty
-    [np,~,ns] = size( theta);
-    ci_theta = nan(np,2,ns);
+    % empty CI matrix
+    [np,nb,ns] = size( theta);
+    ci_theta  = nan(np,2,ns);
 
     % compute the mean theta for linear-scale parameters
     a2 = opt.alpha/2;
@@ -163,8 +171,18 @@ function ci_theta =  mean_theta_ci(theta,m_theta,s_theta,lin,cir,opt)
             ci_theta(lin,1,:) = quantile(theta(lin,:,:),a2,2);   % lower CI bound
             ci_theta(lin,2,:) = quantile(theta(lin,:,:),1-a2,2); % upper CI bound
 
+
+        case 'studentized'
+            
+            std_thetab = s_theta(lin,:,:)/sqrt(nb);
+            stud_theta = (theta(lin,:,:)-m_theta(lin,:,:))./std_thetab ;
+             
+            ci_theta(lin,1,:) = opt.theta0(lin) - std_thetab.*quantile(stud_theta,1-a2,2);   % lower CI bound
+            ci_theta(lin,2,:) = opt.theta0(lin) - std_thetab.*quantile(stud_theta,a2,2); % upper CI bound
+
         otherwise 
             disp('accelerated and bca methods not implemented yet')
+            
     end    
 
     
@@ -176,7 +194,7 @@ function ci_theta =  mean_theta_ci(theta,m_theta,s_theta,lin,cir,opt)
             thcs = theta(c,:,s);
             w = circ_stat('mean_ci',thcs(:),a2); 
             ci_theta(c,1,s) = m_theta(c,s) - w; % lower CI bound
-            ci_theta(c,2,s) = m_theta(c,s) + w;% upper CI bound
+            ci_theta(c,2,s) = m_theta(c,s) + w; % upper CI bound
         end
     end
 
@@ -188,17 +206,35 @@ end
 function opt = check_boot_param_options(theta,opt)
 
     % check the length of the circular vector
+    [np,~,ns] = size(theta);
     if ~isempty(opt.circular)
         opt.circular = opt.circular(:); %make circular  being a col vector
-        assert(size(theta,1)==numel(opt.circular),'theta and theta_circ must have the same length')
+        assert(np==numel(opt.circular),'inconsistent theta and theta_circ dimensions')
     else
-        opt.circular = zeros(size(theta,1),1); % set false for each param in theta
+        opt.circular = zeros(np,1); % set false for each param in theta
     end
 
     % string indicating the method for computing CI
-    legal_ci = {'percentile', 'gaussian', 'accelerated', 'bca'};
+    legal_ci = {'percentile', 'gaussian', 'studentized', 'accelerated', 'bca'};
     opt.ci   = lower(opt.ci);
     assert(any(strcmp(opt.ci,legal_ci)), ['Not a valid ci, possible types are ' legal_ci{:}])
+
+    % tmp error
+    if ~any(strcmp(opt.ci,{'percentile', 'gaussian','studentized'}))
+        error('tmp: accelerated and bca methods not implemented yet') 
+    end
+
+    % if studentized bootstrap, check for the availability of 
+    % the original theta value (theta computed on the original series, not resamples)
+    if strcmp(opt.ci,'studentized')
+        [np0,ns0] = size(opt.theta0);
+        assert(np0*ns0>0,'theta0 must be provided for studentized bootstrap CIs')
+        assert(np==np0 && ns==ns0 , 'inconsistent theta and theta0 dimensions')
+        ncirc = sum( opt.circular);
+        if ncirc >0
+            warning(['studentized bootstrap not applied for the ' num2str(ncirc) 'circular parameters'])
+        end
+    end
 
     % confidence level for constructing CI
     assert(opt.alpha>0 && opt.alpha<1,'alpha must be in (0,1)')
