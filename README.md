@@ -28,6 +28,7 @@ residuals (i.e., observed series-reconstruction).
 This function implements the MBB and SPB algorithms (`method` option) to generate the resamples of the water level series and, if requested, estimate the parameters of a user-specifed model (`tidal_model` option) for each of the generated resamples. 
    
 ```MATLAB
+    % general syntax:
     out = boot_tide(time, y, {'option_name',option_value})
 ```
 
@@ -37,6 +38,7 @@ Via the specification of the `circular` option, the user can request to use circ
 
 
 ```MATLAB
+    % general syntax:
     [m_theta]  = boot_tide_param(theta, {'option_name',option_value}) 
     [m_theta,s_theta]  = boot_tide_param(theta, {'option_name',option_value})
     [m_theta,s_theta,ci_theta]  = boot_tide_param(theta, {'option_name',option_value})
