@@ -37,7 +37,7 @@ function out = boot_tide(time,y,varargin)
 %
 % 'circular', true/false  - boolean flag determining if a circular strategy 
 %           [Politis and Romano (1994)] must be used in constructing the resamples.
-%           Default: false, ignored when using SPB. 
+%           Default: true, ignored when using SPB. 
 %
 % 'lblock_dist', distname - string defining the probability distribution 
 %            to extract/simulate the block lengths for each MBB resample. 

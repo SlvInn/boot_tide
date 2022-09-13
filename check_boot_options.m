@@ -78,7 +78,7 @@ function opt = check_mbb_opt(data,opt)
             case 'geom'
                 opt.lblock_par = 1/(30*24 +1); % probability parameter p
             case 'unif'
-                opt.lblock_par = 60*24;   %max block length in hours 
+                opt.lblock_par = 60*24;   % max block length in hours 
                 % opt.lblock_par = [0, 60*24];   % min-max block length in hours
             case 'fix'
                 opt.lblock_par = opt.lblock;
@@ -108,6 +108,9 @@ function opt = check_mbb_opt(data,opt)
 
     % remove the SPB options
     opt = rmfield(opt,'noise');
+    if ~strcmpi(opt.lblock_dist,'fix')
+        opt = rmfield(opt,'lblock'); 
+    end
 
 end
 

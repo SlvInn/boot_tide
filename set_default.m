@@ -21,7 +21,7 @@ function defaults = set_default(function_name)
             defaults.nboot        = 10^4;        % number of bootstrap resample to generate
             defaults.seed         = 2*floor(rand(2,1)*(10^8)) +1; % pseudo-numebr generator seed: generate an odd number as seed  
             defaults.method       = 'mbb';       % bootstrap type: MBB or SPB
-            defaults.circular     = false;       % use circular MBB or not
+            defaults.circular     = true;        % use circular MBB or not
             defaults.noise        = 'fft';       % method to estimate the residual spectrum: fft, fftnoise, skfft, sknoise, cpfft, cpnoise, dllftt, or dllnoise
             
             defaults.lblock_dist  = 'geom';      % default distribution (MATLAB name) for simulating the block length
