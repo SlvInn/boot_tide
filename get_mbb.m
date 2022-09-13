@@ -126,8 +126,8 @@ function [rl_blk, rand_i0, th] = mbb_block_lengths(t,tresol,opt)
         case 'unif' 
             rl_blk = randi([1 opt.lblock_par], n_blocks, opt.nboot);
           
-        case 'pois' 
-            rl_blk = poissrnd(opt.lblock_par-1, n_blocks, opt.nboot)+1;
+        % case 'pois' 
+        %     rl_blk = poissrnd(opt.lblock_par-1, n_blocks, opt.nboot)+1;
           
         case 'fix'
             rl_blk = repmat(opt.lblock_par, n_blocks, opt.nboot);

@@ -45,15 +45,12 @@ function out = boot_tide(time,y,varargin)
 %                       no distribution involved. 
 %            * 'geom' - blocks with random lengths esimulated from a geometric distribution with 
 %                       parameter 1/p = nhours (see 'lblock_par' definition below)
-%            * 'pois' - blocks with random lengths esimulated from a poisson distribution with 
-%                       parameter lambda = nhours (see 'lblock_par' definition below)
 %            * 'unif' - blocks with random lengths esimulated from an uniform distribution with 
 %                       parameters [0,b] = nhours (see 'lblock_par' definition below)
 %
 % 'lblock_par', theta - block length distribution parameter(s) when using 
 %           random blocks MBB. Specifically, theta has the following interpretations:
 %            * inverse of the average block length for blockdist ='geom'. Default: 1/(30*24 +1) 
-%            * average block length for blockdist = 'pois'. Default: 30*24 
 %            * max block length for blockdist = 'unif' (i.e. nhours is a 2-element vector). 
 %            Default: 60*24, ignored when using SPB.  
 %                      

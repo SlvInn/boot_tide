@@ -65,7 +65,7 @@ function opt = check_mbb_opt(data,opt)
     end
 
     % MBB (variable) block length distribution name [block length sampler]:
-    legal_distrib = {'unif' 'pois' 'geom' 'fix'};
+    legal_distrib = {'unif' 'geom' 'fix'}; % 'pois'
     opt.lblock_dist = lower(opt.lblock_dist);
     assert(any(strcmp(opt.lblock_dist,legal_distrib)), ['Not a valid lblock_dist for MBB, possible distributions are ' legal_distrib{:}])
 
@@ -80,10 +80,11 @@ function opt = check_mbb_opt(data,opt)
             case 'unif'
                 opt.lblock_par = 60*24;   %max block length in hours 
                 % opt.lblock_par = [0, 60*24];   % min-max block length in hours
-            case 'pois' 
-                opt.lblock_par = 30*24 + 1;
             case 'fix'
                 opt.lblock_par = opt.lblock;
+            % OLD: removed since --> Gaussian with this parameter magnitude    
+            % case 'pois' 
+            %     opt.lblock_par = 30*24 + 1;
         end
     else
 
@@ -94,8 +95,8 @@ function opt = check_mbb_opt(data,opt)
                 assert(opt.lblock_par>0 && opt.lblock_par<1,'MBB block length parameter must be a probability in (0,1)')
             case 'unif' 
                 assert(numel(opt.lblock_par)==2,'MBB block length vector must be a 2 element vector (min-max block lengths for an uniform distribution)')
-            case 'pois' 
-                assert(numel(opt.lblock_par)==1,'MBB block length parameter (poisson distribution) must be a scalar (mean block length)') 
+            % case 'pois' 
+            %     assert(numel(opt.lblock_par)==1,'MBB block length parameter (poisson distribution) must be a scalar (mean block length)') 
             case 'fix'
                 assert(numel(opt.lblock_par)==1,'MBB block length must be a scalar')
                 assert(~isnan(opt.lblock_par),'block length cannot be NaN for fix length MBB')
