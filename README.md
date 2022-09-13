@@ -17,23 +17,29 @@ Innocenti, S. and Matte, P. and Fortin, V. and Bernier, N. B., (2022), Residual 
 #### Contents
 1. [boot_tide.m:](#boot_tide.m) construct the residual bootstrap resamples/replicates.  
 2. [boot_tide_param.m:](#boot_tide_param.m) compute the bootstrap plug-in estimators of the parameters and corresponiding confidence intervals.
-3. [examples and templates:](#example-and-templates)
+3. examples and templates folder
 
 
 ### boot_tide.m
 Construct residual bootstrap resamples given an or some observed series and 
 a tidal reconstruction (e.g., tidal HA regression predictions) or the corresponding
 residuals (i.e., observed series-reconstruction).
-The funtion implements the MBB and SPB algorithms (`method` option) to generate the resamples of the water level series and, if requested, estimate the parameters of a user-specifed model for the analysis of water level series (`tidal_model` option). 
+
+This function implements the MBB and SPB algorithms (`method` option) to generate the resamples of the water level series and, if requested, estimate the parameters of a user-specifed model (`tidal_model` option) for each of the generated resamples. 
    
-
-
-
- <!-- This function is similar to cut_reconstr.m but avoids recomputing the model basis function for each set of parameters. Accordingly, the HA model basis function is computed once, or it is read from the optional input arguments to further increase the computational efficiency. -->
-
-
+```MATLAB
+    out = boot_tide(time, y, {'option_name',option_value})
+```
 
 ### boot_tide_param.m
+Calculate the plug-in bootstrap estimators of the parameter replicates of a tidal model (not necessarily produced via `boot_tide.m`, it only needs a matrix of parameters replicates) and the corresponding Confidence Intervals (CIs). 
+Via the specification of the `circular` option, the user can request to use circular statistics for the parameters expressed in radiant or degrees units [e.g., tidal phases]. 
 
 
-### examples and templates
+```MATLAB
+    [m_theta]  = boot_tide_param(theta, {'option_name',option_value}) 
+    [m_theta,s_theta]  = boot_tide_param(theta, {'option_name',option_value})
+    [m_theta,s_theta,ci_theta]  = boot_tide_param(theta, {'option_name',option_value})
+    [m_theta,s_theta,ci_theta,opt]  = boot_tide_param(theta, {'option_name',option_value})
+```
+

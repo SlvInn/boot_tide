@@ -99,7 +99,7 @@ function opt = check_mbb_opt(data,opt)
             %     assert(numel(opt.lblock_par)==1,'MBB block length parameter (poisson distribution) must be a scalar (mean block length)') 
             case 'fix'
                 assert(numel(opt.lblock_par)==1,'MBB block length must be a scalar')
-                assert(~isnan(opt.lblock_par),'block length cannot be NaN for fix length MBB')
+                assert(~isnan(opt.lblock_par), 'block length cannot be NaN for fix length MBB')
                 assert(opt.lblock_par>1 && opt.lblock_par<opt.lblock_par,'MBB Block length must be in (1,T]')
         end
 
