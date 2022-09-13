@@ -3,6 +3,8 @@ function out = boot_tide(time,y,varargin)
 % a tidal reconstruction (e.g., tidal HA regression predictions) or the corresponding
 % residuals (i.e., observed series-reconstruction).
 %
+%     out = boot_tide(time,y,{'option_name',option_value})
+%
 % INPUT:
 % time  - Tx1 vector of arbitrary times [datenum UCT/GMT],
 %         It may include NaNs and time steps may be irregularly distributed. 
@@ -12,14 +14,15 @@ function out = boot_tide(time,y,varargin)
 %         the same time index resampling to conserve the spatial structure of
 %         data. y may include NaNs.
 % 
-% {OPTIONS/VARARGIN} must contain at least one of the following pairs:
+% VARARGIN >> {'option_name',option_value}: 
+% ** Must contain at least one of the following pairs: **
 % 'yhat', yhat - TxS time series of reconstructed water levels at the T time steps for S 
 %                spatial locations. yhat must be s.t. yhat = y - yres
 % 'yres', yres - TxS time series of residuals (y-yhat) at the T time steps for S 
 %                spatial locations. yres must be s.t. yres = y - yhat
 %
 %
-% {OPTIONS/VARARGIN}:
+% Other VARARGIN >> {'option_name',option_value}:
 % 'n_boot', int - Number of bootstrap resamples to generate. Default: n_boot = 10^3
 % 
 % 'method', mtdname - string indicating which bootstrap algorithm must be used 
@@ -79,7 +82,7 @@ function out = boot_tide(time,y,varargin)
 %                      Default: [true for each theta],  if 'tide_model' and 'theta' are provided                 
 %
 %
-% EXPERIMENTAL OPTIONS (presently deprecated, need more tests)
+% EXPERIMENTAL OPTIONS (presently deprecated, need more tests):
 % 'noise', fname - name (string) of the ftt method (noise generating function) to be used to 
 %            simulate semi-parametrically residual resamples with the same spectrum as the observed residuals. 
 %            Allowed values are:
