@@ -70,7 +70,10 @@ function out = get_mbb(data,opt)
           itb   = [itb; [i0:iE]'];       % attach the block of indices to itb
 
         end
-
+        
+        % sub-stract the time length for indices of tc that exceede lt:
+        itb(itb>lt) = itb(itb>lt)-lt;
+        
         % eliminate exceeding indices and store the results in the output variables
         i_boot(:,b) = itb(1:lt);
         blocks{b,1} = lblk(:);
