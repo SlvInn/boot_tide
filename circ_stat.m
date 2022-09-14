@@ -209,7 +209,7 @@ function S = circ_var(alpha, w, d, dim)
 end
 
 
-function S = circ_std(alpha, w, d, dim)
+function S = circ_std(alpha,varargin{:})
 %
 % s = circ_std(alpha, w, d, dim)
 %   
@@ -217,6 +217,8 @@ function S = circ_std(alpha, w, d, dim)
 %
 %   Input:
 %     alpha	sample of angles in radians
+%
+%   {varargin}:
 %     [w		number of incidences in case of binned angle data]
 %     [d    spacing of bin centers for binned data, if supplied 
 %           correction factor is used to correct for bias in 
@@ -228,7 +230,7 @@ function S = circ_std(alpha, w, d, dim)
 %
 %   Output:
 %     S     circular std 2*(1-r)
-    S = 2 * circ_var(alpha, w, d, dim);
+    S = 2 * circ_var(alpha, varargin{:});
 end
 
 
