@@ -58,27 +58,24 @@ end
 
 
 % construct a graphic for the log of the amplitude CI bounds (in cm)
-
-% boot amplitudes
-ticks = false;
-col   = [ 27,158,119; 217,95,2;0 0 0; ]./255; %  150 150 150;
+col   = [ 27,158,119; 217,95,2;0 0 0; ]./255; 
 bound_names = {'CI lower bound','CI upper bound'};
 for s = 1: ns
-    fig = figure('visible','off'); % def a figure obj
+    fig = figure('visible','off'); 
 
     for c = 1 : 3
         mtd = ci_methods{c};
 
-
         % amplitudes boot CIs
         ciA = log(ci_amp.(mtd)*100);
 
-        
-
+        % make a suboplot for the lower bound and another for the upper bound
         for bound = 1 : 2
 
             if c==3 && bound==2
                 ticks = true;
+            else
+                ticks = false;    
             end
 
             subplot(2,1,2-bound+1); hold on
@@ -100,7 +97,7 @@ for s = 1: ns
         end
     end
 
-    print(fig,'-dpdf',['figs/gr3_boot_CIs_' stations{s}],'-fillpage') 
+    print(fig,'-dpdf',['figs/gr3_boot_CIs_' stn{s}],'-fillpage') 
 close all
 
 end
