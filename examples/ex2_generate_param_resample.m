@@ -95,7 +95,7 @@ pl(3) = plot_amplitudes(ciA(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',tr
 
 % add a ref 
 mA = log(cf.A*100);
-pl(4) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',true,'staircase',true,'-','color',[.7,.7,.7]); % UTide estimation
+pl(4) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',true,'staircase',false,'*','color',[.7,.7,.7]); % UTide estimation
 
 
 % set the axes formats
