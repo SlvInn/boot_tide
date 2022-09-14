@@ -41,6 +41,11 @@ function opt = check_boot_options(data,opt)
         assert(~isempty((opt.theta)), 'theta must be provided for non empty tide_model')
         opt.theta = opt.theta(:); %make theta being a col vector
 
+
+        ns = size(data.y,2);
+        if ns>1
+            warning(['applying the same tide_model to ' num2str(ns) ' locations'])
+        end
     else
         opt = rmfield(opt,{'tide_model','theta'});     
     end
