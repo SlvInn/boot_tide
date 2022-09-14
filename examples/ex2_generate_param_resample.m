@@ -95,7 +95,7 @@ plot_amplitudes(ciA(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k',
 
 % add a ref 
 mA = log(cf.A*100);
-pl(3) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',true,'staircase',false,'xk'); % UTide estimation
+pl(3) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',true,'staircase',false,'xr'); % UTide estimation
 
 
 % set the axes formats
@@ -104,7 +104,7 @@ set(gca,'ytick',log(ytk),'yticklabel',ytk)
 ylim(log([0.001 120]))
 
 % text 
-legend('mbb','mbb CI','UTide','location','S')
+legend(pl(:),'mbb','mbb CI','UTide','location','S')
 ylabel('A_k [cm]')
 title('Tidal amplitude')
 
@@ -119,7 +119,7 @@ pl(2) = plot_amplitudes(ci_pha(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase'
 pl(3) = plot_amplitudes(ci_pha(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k','linewidth',1.5);
 
 % add a ref 
-pl(4) = plot_amplitudes(cf.g,cf.name,cf.aux.frq,'ticks',false,'staircase',false,'xk'); % UTide estimation
+pl(4) = plot_amplitudes(cf.g,cf.name,cf.aux.frq,'ticks',false,'staircase',false,'xr'); % UTide estimation
 
 
 % set the axes formats
