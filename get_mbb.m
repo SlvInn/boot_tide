@@ -26,10 +26,11 @@ function out = get_mbb(data,opt)
 
     % define the size of the result structure 
     if isfield(opt,'tide_model')
-        nout = numel(opt.theta); 
+        nout = size(opt.theta,1); 
     else
         nout = lt;  
     end  
+    
 
     % empties
     i_boot  = nan(lt,nb);  % index 

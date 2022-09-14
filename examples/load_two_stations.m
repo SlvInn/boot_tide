@@ -13,6 +13,7 @@ te = datenum(2000,12,31,23,0,0); % date end
 % load data at 2 stations 
 stations = {'Halifax', 'St.Francois'};
 ns = length(stations);
+stn = {'hal','stf'};
 
 
 % load the observed water levels

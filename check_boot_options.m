@@ -39,12 +39,11 @@ function opt = check_boot_options(data,opt)
         assert(strcmp(class(opt.tide_model),'function_handle'),'tide_model must be a function handle')
         assert(nargin(opt.tide_model)==1,'tide_model can only take 1 input argument (observation vector)')
         assert(~isempty((opt.theta)), 'theta must be provided for non empty tide_model')
-        opt.theta = opt.theta(:); %make theta being a col vector
-
-
+        % opt.theta = opt.theta(:); %don't make theta being a col vector since we may have 2 stations
+        
         ns = size(data.y,2);
         if ns>1
-            warning(['applying the same tide_model to ' num2str(ns) ' locations'])
+            warning(['applying the same tide_model to ' num2str(ns) ' spatial locations'])
         end
     else
         opt = rmfield(opt,{'tide_model','theta'});     

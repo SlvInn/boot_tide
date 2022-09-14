@@ -157,14 +157,18 @@ function ci_theta =  mean_theta_ci(theta,m_theta,s_theta,lin,cir,opt)
     [np,nb,ns] = size( theta);
     ci_theta  = nan(np,2,ns);
 
+    for s = 1 : ns
+        theta0(:,:,s) = repmat(opt.theta0(:,s),1,nb);
+    end
+
     % compute the mean theta for linear-scale parameters
     a2 = opt.alpha/2;
     switch opt.ci
         case 'gaussian' 
 
             z = norminv(1-a2);
-            ci_theta(lin,1,:) = m_theta(lin,:,:) - z.*sqrt(s_theta(lin,:,:)); % lower CI bound
-            ci_theta(lin,2,:) = m_theta(lin,:,:) + z.*sqrt(s_theta(lin,:,:)); % upper CI bound
+            ci_theta(lin,1,:) = m_theta(lin,:) - z.*sqrt(s_theta(lin,:)); % lower CI bound
+            ci_theta(lin,2,:) = m_theta(lin,:) + z.*sqrt(s_theta(lin,:)); % upper CI bound
 
         case 'percentile'
 
@@ -174,12 +178,19 @@ function ci_theta =  mean_theta_ci(theta,m_theta,s_theta,lin,cir,opt)
 
         case 'studentized'
             
-            std_thetab = s_theta(lin,:,:)/sqrt(nb);
-            stud_theta = (theta(lin,:,:)-m_theta(lin,:,:))./std_thetab ;
-             
-            ci_theta(lin,1,:) = opt.theta0(lin) - std_thetab.*quantile(stud_theta,1-a2,2);   % lower CI bound
-            ci_theta(lin,2,:) = opt.theta0(lin) - std_thetab.*quantile(stud_theta,a2,2); % upper CI bound
 
+            for s = 1: ns
+                
+                std_thetab = repmat(s_theta(lin,s)./sqrt(nb),1,nb);
+                  theta0_s = repmat(opt.theta0(lin,s),1,nb);
+                stud_theta = (theta(lin,:,s)-theta0_s)./std_thetab;
+
+                ci_theta(lin,1,s) = opt.theta0(lin,s) - std_thetab.*quantile(stud_theta,1-a2,2); % lower CI bound
+                ci_theta(lin,2,s) = opt.theta0(lin,s) - std_thetab.*quantile(stud_theta,a2,2);   % upper CI bound
+
+            end
+             
+            
         otherwise 
             disp('accelerated and bca methods not implemented yet')
             

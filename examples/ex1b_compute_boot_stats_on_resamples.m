@@ -9,8 +9,6 @@ clc; clear
 % load one year of hourly data at two stations:
 load_two_stations
 
-
-
 % MBB method
 disp('>> apply boot_tide MBB without options (default values)')
 mbb_out = boot_tide(t(:,1),h,'yhat',hhat); 
