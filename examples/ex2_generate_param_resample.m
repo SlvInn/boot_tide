@@ -90,8 +90,8 @@ pl(1) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k
 
 % amplitudes boot CIs
 ciA = log(ci_amp*100);
-pl(2) = plot_amplitudes(ciA(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k','linewidth',1.5);
-plot_amplitudes(ciA(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k','linewidth',1.5);
+pl(2) = plot_amplitudes(ciA(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',1);
+plot_amplitudes(ciA(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',1);
 
 % add a ref 
 mA = log(cf.A*100);
@@ -115,8 +115,8 @@ subplot(2,1,2); hold on
 pl(1) = plot_amplitudes(m_pha,cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',2);
 
 % amplitudes boot CIs
-pl(2) = plot_amplitudes(ci_pha(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k','linewidth',1.5);
-pl(3) = plot_amplitudes(ci_pha(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k','linewidth',1.5);
+pl(2) = plot_amplitudes(ci_pha(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',1);
+pl(3) = plot_amplitudes(ci_pha(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',1);
 
 % add a ref 
 pl(4) = plot_amplitudes(cf.g,cf.name,cf.aux.frq,'ticks',false,'staircase',false,'xr'); % UTide estimation
