@@ -29,7 +29,7 @@ disp(['computing bott statistics from ' num2str(mbb_out.options.nboot) ' water l
 % construct graphics for the mean water level simulated over a short period (one week)
 % (just to check the series properties)
 
-fig = figure; % def a figure obj
+fig = figure('visible','off'); % def a figure obj
 
          t0 = datenum(2000,09,01,0,0,0);  % date start
          te = datenum(2000,09,07,23,0,0); % date end
@@ -56,12 +56,13 @@ for s = 1 : 2
    title(stations{s})
 
 end       
-legend('original','boot avg')
-
+legend('original','boot avg')      
+print(fig,'-dpdf',['figs/gr1_mean_boot_wat_lev'],'-fillpage') 
+close all
 
 
 % construct graphics for the width of water level ci estimated over a short period (one week)
-fig = figure; % def a figure obj
+fig = figure('visible','off'); % def a figure obj
 
 
 % create graphics for a random week
@@ -79,6 +80,7 @@ for s = 1 : 2
    title(stations{s})
 
 end       
-
+print(fig,'-dpdf',['figs/gr1_wat_lev_ci'],'-fillpage') 
+close all
 
 
