@@ -101,7 +101,7 @@ pl(4) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',true,'staircase',false,'xk
 % set the axes formats
 ytk = [0.0005 0.001 0.0025 0.005 0.01 0.025 0.05 0.1 0.2 0.5 1 2]*100;
 set(gca,'ytick',log(ytk),'yticklabel',ytk)
-ylim(log([0.001 220]))
+%ylim(log([0.001 220]))
 
 % text 
 legend('mbb','mbb CI','','UTide','location','S')
@@ -112,11 +112,11 @@ title('Tidal amplitude')
 subplot(2,1,2); hold on
 
 % boot phases
-pl(1) = plot_amplitudes(m_pha,cf.name,cf.aux.frq,'ticks',false,'staircase',false,'-k','linewidth',2);
+pl(1) = plot_amplitudes(m_pha,cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',2);
 
 % amplitudes boot CIs
-pl(2) = plot_amplitudes(ci_pha(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',false,':k');
-pl(3) = plot_amplitudes(ci_pha(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',false,':k');
+pl(2) = plot_amplitudes(ci_pha(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k');
+pl(3) = plot_amplitudes(ci_pha(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,':k');
 
 % add a ref 
 pl(4) = plot_amplitudes(cf.g,cf.name,cf.aux.frq,'ticks',false,'staircase',false,'xk'); % UTide estimation
