@@ -90,46 +90,48 @@ pl(1) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k
 
 % amplitudes boot CIs
 ciA = log(ci_amp*100);
-pl(2) = plot_amplitudes(ciA(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k');
-pl(3) = plot_amplitudes(ciA(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k');
+pl(2) = plot_amplitudes(ciA(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'--k');
+pl(3) = plot_amplitudes(ciA(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'--k');
 
 % add a ref 
 mA = log(cf.A*100);
-pl(4) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',true,'staircase',false,'^k','markerfacecolor',[.7,.7,.7],); % UTide estimation
+pl(4) = plot_amplitudes(mA,cf.name,cf.aux.frq,'ticks',true,'staircase',false,'^k'); % UTide estimation
 
 
 % set the axes formats
 ytk = [0.0005 0.001 0.0025 0.005 0.01 0.025 0.05 0.1 0.2 0.5 1 2]*100;
 set(gca,'ytick',log(ytk),'yticklabel',ytk)
-ylim(log([0.045 20]))
+ylim(log([0.001 20]))
 
 % text 
-% legend('','location','N')
+legend('mbb','mbb CI','','UTide','location','N')
 ylabel('A_k [cm]')
 title('Tidal amplitude')
 
 
+% boot phases
+pl(1) = plot_amplitudes(m_pha,cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',2);
+
+% amplitudes boot CIs
+pl(2) = plot_amplitudes(ci_pha(:,1),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'--k');
+pl(3) = plot_amplitudes(ci_pha(:,2),cf.name,cf.aux.frq,'ticks',false,'staircase',true,'--k');
+
+% add a ref 
+pl(4) = plot_amplitudes(cf.g,cf.name,cf.aux.frq,'ticks',false,'staircase',false,'^k'); % UTide estimation
 
 
+% set the axes formats
+ytk = [0.0001 0.001 0.01 0.1 0.25 1];
+set(gca,'ytick',log(ytk),'yticklabel',ytk)
+ylim(log([0.00001 1.1]))
+
+% text 
+% legend('','location','N')
+ylabel('g_k [cm]')
+title('Tidal phases')
 
 
 
 print(fig,'-dpdf',['figs/gr2_boot_plugin_estimators'],'-fillpage') 
 close all
 
-
-
-
-assert(false,'stop here')
-% construct a graphic for the log of the amplitude stds (in cm)    
-subplot(2,1,2); hold on
-mA = log(theta_boot.(mtd{i}).std.A*100);
-aux('plot_amplitudes',mA,cf.name,cf.aux.frq,ticks);
-
-% add a ref and set the axes formats
-if i==nMtd
-   mA = log(cf.Std.A*100);
-      aux('plot_amplitudes',mA,cf.name,cf.aux.frq,true,':k');% UTide std(Ak)
-   ylabel('log(\sigma_{A_k})')
-    title('Tidal amplitude std')
-end
