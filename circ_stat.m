@@ -209,7 +209,7 @@ function S = circ_var(alpha, w, d, dim)
 end
 
 
-function S = circ_std(alpha,varargin{:})
+function S = circ_std(alpha,varargin)
 %
 % s = circ_std(alpha, w, d, dim)
 %   
