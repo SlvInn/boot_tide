@@ -22,7 +22,7 @@ wl_resamples = mbb_out.y_boot;
 tic; [wl_mean,wl_std,wl_ci] = boot_tide_param(wl_resamples); tc =toc;
 
 % print the computing time
-disp(['computing bott statistics from ' num2str(mbb_out.options.nboot) ' water level resamples took ' num2str(tc) ' sec.'])
+disp(['computing boot statistics from ' num2str(mbb_out.options.nboot) ' water level resamples took ' num2str(tc) ' sec.'])
 
 
     
