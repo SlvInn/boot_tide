@@ -41,7 +41,7 @@ options for MBB only:
 - `circular`: if true use circular MBB 
 - `lblock_dist`: distribution (MATLAB name) for simulating the block length
 - `lblock_par`: block length distribution parameter
-- `lblock`: MBB block length [in hours] 
+- `lblock`: MBB block length [in hours] (only for 'fix' MBB)
 - `block_output`: if true return the MBB matrices used for construction the resamples (e.g., time indices)
 
 options for SPB only (EXPERIMENTAL):
@@ -49,7 +49,7 @@ options for SPB only (EXPERIMENTAL):
 
 option for computing the parameter resamples: 
 - `tide_model`: function handle for estimating the tidal parameters on each y resample 
-
+- `theta`: vector of paramaters computed on the ortiginal samples 
 
 ### boot_tide_param.m
 Calculate the plug-in bootstrap estimators of the parameter replicates of a tidal model (not necessarily produced via `boot_tide.m`, it only needs a matrix of parameters replicates) and the corresponding Confidence Intervals (CIs). 
