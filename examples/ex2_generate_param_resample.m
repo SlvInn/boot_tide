@@ -108,6 +108,8 @@ legend('mbb','mbb CI','','UTide','location','N')
 ylabel('A_k [cm]')
 title('Tidal amplitude')
 
+% construct a graphic for the phases (in degrees)
+subplot(2,1,2); hold on
 
 % boot phases
 pl(1) = plot_amplitudes(m_pha,cf.name,cf.aux.frq,'ticks',false,'staircase',true,'-k','linewidth',2);
