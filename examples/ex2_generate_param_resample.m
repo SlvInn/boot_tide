@@ -104,7 +104,7 @@ set(gca,'ytick',log(ytk),'yticklabel',ytk)
 ylim(log([0.001 20]))
 
 % text 
-legend('mbb','mbb CI','','UTide','location','N')
+legend('mbb','mbb CI','','UTide','location','S')
 ylabel('A_k [cm]')
 title('Tidal amplitude')
 
@@ -123,9 +123,9 @@ pl(4) = plot_amplitudes(cf.g,cf.name,cf.aux.frq,'ticks',false,'staircase',false,
 
 
 % set the axes formats
-ytk = [0.0001 0.1 1 45 90 180 360];
-set(gca,'ytick',log(ytk),'yticklabel',ytk)
-ylim(log([0.00001 360]))
+ytk = (1:45:360);
+set(gca,'ytick',ytk,'yticklabel',ytk)
+
 
 % text 
 % legend('','location','N')
