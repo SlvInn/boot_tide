@@ -1,11 +1,13 @@
-## boot_tide: MATLAB scripts for tide model uncertainty analysis based on residual resampling
-Set of functions implementing two residual boostrap algorithms for tidal analyses.  
+## boot_tide: tide model uncertainty analysis based on residual resampling
+Source code implementing the residual bootstrap algorithms presented in 
+Innocenti et al. [2022](https://journals.ametsoc.org/view/journals/atot/aop/JTECH-D-21-0060.1/JTECH-D-21-0060.1.xml):
+
 1. a Moving Block Bootstrap (MBB) that resamples fixed or random length blocks of the tidal model resisuals, and 
 2. a Semi-Parametric Bootstrap (SPB) that simulates noise realizations from the Fast Fourier Transform of the residuals. 
 
 Both methods are intended to produce similar results with comparable accuracy. The MBB can be applied in virtually all sampling conditions, but it is more computationally demanding than SPB, especially for long records. MBB can also handle the construction of the residual resamples at various spatial locations (e.g., stations) while accounting for (part of) the spatial autocorrelation between them. Similarly, it could be in principle used to work with bi-dimensional data (current series, treating 2D series as 2-location input matrices) but it hasn't been tested in this use. The SPB is faster than some MBB methods, but constructs independent residual resamples at various spatial locations. Also, some interpolation is needed for resampling via SPB irregularly sampled records or series with missing data since it involves a Fourier analysis of residuals.  
 
-For a discussion of the MBB and SPB residual resampling, including their comparison with other existing tidal analysis packages: Innocenti et al. [2022](DOI:10.1175/JTECH-D-21-0060.1)
+For a discussion of the MBB and SPB residual resampling, including their comparison with other existing tidal analysis packages, see Innocenti et al. [2022](DOI:10.1175/JTECH-D-21-0060.1)
 
 The project uses (adapted versions) of contributed MATLAB functions, including: 
 - `fttnoise.m` by Aslak Grinsted ([2009](https://www.mathworks.com/matlabcentral/fileexchange/32111-fftnoise-generate-noise-with-a-specified-power-spectrum)), and 
