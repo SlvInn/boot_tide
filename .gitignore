@@ -29,7 +29,7 @@ test*
 
 #MATLAB
 *.m~
-
+*.mat
 
 # SPECIFIC
 .DS_Store*
