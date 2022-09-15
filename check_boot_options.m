@@ -34,7 +34,7 @@ function opt = check_boot_options(data,opt)
         opt = check_spb_opt(opt);  
     end    
 
-    % check that tide_model is a funtion handle or empty
+    % check that tide_model is a function handle or empty
     if ~isempty((opt.tide_model))
         assert(strcmp(class(opt.tide_model),'function_handle'),'tide_model must be a function handle')
         assert(nargin(opt.tide_model)==1,'tide_model can only take 1 input argument (observation vector)')
@@ -54,7 +54,7 @@ end
 
 function opt = check_mbb_opt(data,opt)
 
-    % MBB circular option (avoid truncation at series end)
+    % MBB circular option (avoid truncation at the series end)
     assert(numel(opt.circular)==1,'circular must be scalar (boolean or 0-1)')
     assert(islogical(opt.circular) || opt.circular==0 || opt.circular==1,'circular must be boolean or 0-1')
 
@@ -65,7 +65,7 @@ function opt = check_mbb_opt(data,opt)
     dt = nanmax(data.t) - nanmin(data.t);  % need the statistics toolbox
     % dt = max(data.t(~isnan(data.t))) - min(data.t(~isnan(data.t))); % [days]
     if opt.lblock > 0.1*(dt*24) % the block length must be at least 1/10 of series length in hours
-        warning('check_boot_opt: block length greater than 1/10 of the observed time period')
+        warning('check_boot_opt: block length greater than 1/10 of the observed period')
     end
 
     % MBB (variable) block length distribution name [block length sampler]:

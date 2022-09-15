@@ -38,19 +38,21 @@ function [m_theta, s_theta,  ci_theta,  opt] = boot_tide_param(theta,varargin)
 %           circular mean calculated from circ_mean.m are returned for circular parameters.
 %
 % {OPTIONAL OUTPUT/ VARARGOUT}:
-% >> [m_theta,s_theta]  = boot_tide_param(theta)
+% 
+% >> [m_theta,s_theta]  = boot_tide_param(theta) % bootstrap estimates of the parameters (bootstrap distribution means)
 % s_theta - (P x S) matrix of the parameter standard errors over the nboot replicates.
 %            circular variance calculated from circ_var.m are returned for circular parameters.
 %
-% >> [m_theta,s_theta,ci_theta]  = boot_tide_param(theta)
+% >> [m_theta,s_theta,ci_theta]  = boot_tide_param(theta) % bootstrap estimates of the parameters and their variability
 % ci_theta - (P x 2 x S) matrix of the parameter confidence interval bounds.
 %
-% >> [m_theta,s_theta,ci_theta,opt]  = boot_tide_param(theta)
+% >> [m_theta,s_theta,ci_theta,opt]  = boot_tide_param(theta) %bootstrap estimates of the parameters and their CIs
 % opt - Structures containing the option values used in the boot_tide_param.m call
 %
 %
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2020/04 - 2022/09
 %
+
 
     % make theta being a 3D matrix
     thsh = size(theta);

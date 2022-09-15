@@ -1,7 +1,7 @@
 function out  = circ_stat(fname,varargin)
-% Container circular statistics functions, mostly adapted from the  
+% Container circular statistics functions (mostly adapted from the  
 % Circular Statistics Toolbox for Matlab - P. Berens, 2009
-% berens@tuebingen.mpg.de - https://www.jstatsoft.org/article/view/v031i10
+% berens@tuebingen.mpg.de - https://www.jstatsoft.org/article/view/v031i10)
 %
 % Major changes: 
 % - select only some functions
@@ -17,7 +17,9 @@ function out  = circ_stat(fname,varargin)
 %
 %
 % INPUT:
-%    fname: function name, see each specific subfunction
+%    fname: function name >>> main functions:
+%            mean, mean_ci, var, med, std, skew, kurt, quartile
+%            corr, lincirccorr, ang2rad, rad2ang
 % varargin: function args, see each specific subfunction
 %
 % silvia.innocenti@ec.gc.ca, 08/2022
@@ -29,7 +31,7 @@ function out  = circ_stat(fname,varargin)
         case 'mean_ci'
             out = circ_mean_ci_width(varargin{:}); 
 
-        case 'r'
+        case {'r', 'mean_length'}
             out = circ_r(varargin{:});  
 
         case {'var', 'variance'}  
@@ -44,13 +46,13 @@ function out  = circ_stat(fname,varargin)
                 out = out0;
             end
             
-        case {'skewness','skewness0'}
+        case {'skew','skewness','skewness0'}
             [out,out0] = circ_skewness(varargin{:});   
             if strcmpi(fname,'skewness0')
                 out = out0;
             end
             
-        case {'kurtosis','kurtosis0'} 
+        case {'kurt', 'kurtosis','kurtosis0'} 
             [out,out0] = circ_kurtosis(varargin{:}); 
             if strcmpi(fname,'kurtosis0')
                 out = out0;

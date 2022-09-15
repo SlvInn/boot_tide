@@ -46,10 +46,10 @@ function out = boot_tide(time,y,varargin)
 %            Allowed distname:
 %            * 'fix'  - blocks with fixed length = nhours (see the 'blocklength' input below), 
 %                       no distribution involved. 
-%            * 'geom' - blocks with random lengths esimulated from a geometric distribution with 
-%                       parameter 1/p = nhours (see 'lblock_par' definition below)
-%            * 'unif' - blocks with random lengths esimulated from an uniform distribution with 
-%                       parameters [0,b] = nhours (see 'lblock_par' definition below)
+%            * 'geom' - blocks with random lengths simulated from a geometric distribution with 
+%                       parameter 1/p = nhours (see 'lblock_par' definition below).
+%            * 'unif' - blocks with random lengths simulated from a uniform distribution with 
+%                       parameters [0,b] = nhours (see 'lblock_par' definition below).
 %
 % 'lblock_par', lblkpar - block length distribution parameter(s) when using 
 %           random blocks MBB. Specifically, theta has the following interpretations:
@@ -60,7 +60,7 @@ function out = boot_tide(time,y,varargin)
 % 'lblock', nhours - block length [in hours] for fixed length block in MBB 
 %           Default: 30*24 + 1, ignored when using SPB.  
 %
-% 'block_output', bool - if true return the matrices used for construction the MBB resamples  
+% 'block_output', bool - if true, return the matrices used for constructing the MBB resamples  
 %                     (time indices, block start, and block length) in the OUTPUT structure. See below, 
 %                     the OUTPUT section.
 %
@@ -80,7 +80,7 @@ function out = boot_tide(time,y,varargin)
 % 'noise', fname - name (string) of the ftt method (noise generating function) to be used to 
 %            simulate semi-parametrically residual resamples with the same spectrum as the observed residuals. 
 %            Allowed values are:
-%               - 'fft'    | 'fftnoise': use the fftnoise.m function  >> Default: it is the only option that don't print a warning at screen
+%               - 'fft'    | 'fftnoise': use the fftnoise.m function  >> Default: it is the only option that doesn't print a warning at screen
 %               - 'skfft'  | 'sknoise'  | 'skewed': use the sknoise.m function 
 %               - 'cpfft'  | 'cpnoise': use the cpnoise.m function 
 %               - 'dllftt' | 'dllnoise' | 'daniell': use the dllnoise.m function 
@@ -108,15 +108,8 @@ function out = boot_tide(time,y,varargin)
 % TODO:
 % - rename tidal_model to something better
 % - test for non-hourly data
-% - test for hourly data in UTide and NS_Tide
-% - test works if the estimation at multiple location works when prescribing a tidal_model: the model must be the same funtion handle at all locations
 % - change the way of dealing with missing values > add the possibility of choosing valid time steps one location at time
-% - change the SPB to account for the spatial dependece of S locations 
-%
-%   
-% !! NOTE !! If working with irregular times, attention in setting the bootstrap
-% parameters (check the block length, etc., since internal variables and 
-% scripts have only been tested for hourly data)
+% - change the SPB to account for the spatial dependence of S locations 
 %
 % S. Innocenti, silvia.innocenti@ec.gc.ca, 2020/04 - 2022/09
 %
@@ -129,7 +122,7 @@ function out = boot_tide(time,y,varargin)
     boot_opt = set_options('boot',varargin{:});
     boot_opt = check_boot_options(data,boot_opt);
     
-    % intialize the output structure based on the input data and options
+    % initialize the output structure based on the input data and options
     out = set_options('output','options',boot_opt, 'yhat',data.yhat, 'yres',data.yres);
 
     % get the resamples (time indices and or simulated y)

@@ -17,9 +17,9 @@ function defaults = set_default(function_name)
     
         case 'boot'
         
-            % set defaults  bootstrap parameters
-            defaults.nboot        = 10^4;        % number of bootstrap resample to generate
-            defaults.seed         = 2*floor(rand(2,1)*(10^8)) +1; % pseudo-numebr generator seed: generate an odd number as seed  
+            % set default bootstrap parameters
+            defaults.nboot        = 10^4;        % number of bootstrap resamples to generate
+            defaults.seed         = 2*floor(rand(2,1)*(10^8)) +1; % pseudo-number generator seed: generate an odd number as seed  
             defaults.method       = 'mbb';       % bootstrap type: MBB or SPB
             defaults.circular     = true;        % use circular MBB or not
             defaults.noise        = 'fft';       % method to estimate the residual spectrum: fft, fftnoise, skfft, sknoise, cpfft, cpnoise, dllftt, or dllnoise
@@ -27,7 +27,7 @@ function defaults = set_default(function_name)
             defaults.lblock_dist  = 'geom';      % default distribution (MATLAB name) for simulating the block length
             defaults.lblock_par   = [];          % block length distribution parameter 
             defaults.lblock       = 31*24;       % MBB block length [h]
-            defaults.block_output = false;       % if true return the MBB matrices used for construction the resamples (mbb block sampling)
+            defaults.block_output = false;       % if true return the MBB matrices used for constructing the resamples (mbb block sampling)
             
             defaults.tide_model = [];  % function handle for estimating the tidal parameters on each y resample 
             defaults.theta      = [];  % vector of parameter estimated on the observed sample [i.e., theta = tide_model(y)]
@@ -41,7 +41,7 @@ function defaults = set_default(function_name)
 
         case 'boot_param'
 
-            defaults.circular   = [];           % vector indicating which compontent of theta are circural variables (e.g., phases)  
+            defaults.circular   = [];           % vector indicating which component of theta are circural variables (e.g., phases)  
             defaults.circ_units = 'rad';        % units of circular parameters: 'rad', 'radians', 'deg', or 'degrees'
             defaults.ci         = 'percentile'; % string indicating the confidence interval method to use: 'percentile', 'gaussian', 'studentized', 'accelerated', 'bca'
             defaults.alpha      = 0.05;         % confidence level for constructing CI
