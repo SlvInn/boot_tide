@@ -7,7 +7,9 @@ Both methods are intended to produce similar results with comparable accuracy. T
 
 For a discussion of the MBB and SPB residual resampling, including their comparison with other existing tidal analysis packages: Innocenti et al. 2022, DOI:10.1175/JTECH-D-21-0060.1
 
-The project use `fttnoise.m` by Aslak Grinsted (2009; https://www.mathworks.com/matlabcentral/fileexchange/32111-fftnoise-generate-noise-with-a-specified-power-spectrum) and other contributed functions.
+The project uses (adapted versions) of contributed MATLAB functions, including: 
+- `fttnoise.m` by Aslak Grinsted ([2009](https://www.mathworks.com/matlabcentral/fileexchange/32111-fftnoise-generate-noise-with-a-specified-power-spectrum)), and 
+- the `CircStat` package by Berens ([2009](https://www.jstatsoft.org/article/view/v031i10))
 
 ---- 
 silvia.innocenti@ec.gc.ca, August 2022.
