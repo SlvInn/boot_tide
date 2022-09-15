@@ -1,4 +1,4 @@
-# boot_tide: MATLAB scripts for tide model resampling-based uncertainty analysis 
+## boot_tide: MATLAB scripts for tide model uncertainty analysis based on residual resampling
 Set of functions implementing two residual boostrap algorithms for tidal analyses.  
 1. a Moving Block Bootstrap (MBB) that resamples fixed or random length blocks of the tidal model resisuals, and 
 2. a Semi-Parametric Bootstrap (SPB) that simulates noise realizations from the Fast Fourier Transform of the residuals. 
@@ -9,14 +9,14 @@ For a discussion of the MBB and SPB residual resampling, including their compari
 
 The project uses (adapted versions) of contributed MATLAB functions, including: 
 - `fttnoise.m` by Aslak Grinsted ([2009](https://www.mathworks.com/matlabcentral/fileexchange/32111-fftnoise-generate-noise-with-a-specified-power-spectrum)), and 
-- the `CircStat` package by Berens ([2009](https://www.jstatsoft.org/article/view/v031i10))
+- `CircStat` by Berens ([2009](https://www.jstatsoft.org/article/view/v031i10))
 
 ---- 
 silvia.innocenti@ec.gc.ca, August 2022.
 
 Innocenti, S. and Matte, P. and Fortin, V. and Bernier, N. B., (2022), Residual bootstrap methods for parameter uncertainty assessment in tidal analysis with temporally correlated noise, JTECH, DOI:10.1175/JTECH-D-21-0060.1
 
-#### Contents
+# Contents
 1. [boot_tide.m:](#boot_tide.m) construct the residual bootstrap resamples/replicates.  
 2. [boot_tide_param.m:](#boot_tide_param.m) compute the bootstrap plug-in estimators of the parameters and corresponiding confidence intervals.
 3. examples and templates folder
