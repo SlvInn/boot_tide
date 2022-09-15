@@ -30,6 +30,7 @@ test*
 #MATLAB
 *.m~
 *.mat
+data/*.mat
 
 # SPECIFIC
 .DS_Store*
