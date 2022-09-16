@@ -1,7 +1,7 @@
 % ex1b_compute_boot_stats_on_resamples.m
 %
-% Use the boot_tide.m fonction for generating MBB water level resamples
-% at two stations and compute bootstrap plug-in statistics.
+% Use the boot_tide.m function for generating MBB water level resamples
+% at two stations and compute bootstrap plug-in statistics with boot_tide_param.m.
 %
 % silvia.innocenti@ec.gc.ca, 2022/08/30. 
 clc; clear

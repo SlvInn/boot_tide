@@ -1,7 +1,7 @@
 % ex3a_compare_boot_ci.m
 %
-% Compute the tidal amplitude and phase boot estimators and CI
-% with the percentile, gaussian, and studentized boot methods 
+% Compute the bootstrap estimators and CIs for the tidal HA amplitudes and phases 
+% using the percentile, gaussian, and studentized bootstrap methods 
 % and compare them graphically.
 %
 % silvia.innocenti@ec.gc.ca, 2022/08/30. 

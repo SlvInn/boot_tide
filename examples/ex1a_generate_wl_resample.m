@@ -1,4 +1,4 @@
-% ex1_generate_wl_resample.m
+% ex1a_generate_wl_resample.m
 % 
 % Use the boot_tide.m fonction for generating MBB and SPB water level resamples
 % given the water level reconstructions (from tidal HA) at two stations. 

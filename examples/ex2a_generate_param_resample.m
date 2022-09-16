@@ -7,9 +7,9 @@
 % silvia.innocenti@ec.gc.ca, 2022/08/30. 
 clc; clear
 
-% load one year of hourly data at one station:
+% load one year of hourly data at one station
+% and the corresponding HA results  
 load_one_station
-
 
 
 %% define a model for computing the bootstrap parameter replicates
@@ -19,20 +19,20 @@ load_one_station
 
 
 % use some quantities estimated on the original water level sample 
-w = sqrt(cf.W);     % IRLS weight
+w = sqrt(cf.W);     % WLS/IRLS weight
 theta = cf.M;       % HA parameters (sin-cos amplitudes and the intercept)
-B1 = [B ones(size(B,1),1)]; % add a column for the intercept
+B1 = [B ones(size(B,1),1)]; % HA regressor matrix ( add a column for the intercept)
   
 % function handle to be passed to tide_model 
+% (returns the HA parameters for a given water level series)
 tidemdl = @(y) (w(~isnan(y)).*B1(~isnan(y),:)) \ (w(~isnan(y)).*y(~isnan(y))); 
  
 
 %% apply the MBB
 
 % define the boot parameters
-nboot = 10^2;
+nboot = 10^3; % very low value, just for testing (reduce the computing time)
 boot_opt = {'yhat',hhat,'nboot',nboot,'lblock_dist','geom','tide_model',tidemdl,'theta',theta};
-% use a low value of nboot to reduce the computing time
 
 % construct the resamples
 tic; mbb_out = boot_tide(t,h,boot_opt{:}); 
@@ -73,5 +73,5 @@ tc_boot_ci = toc; % stock the computing time
 disp(['estimating amplitude and phase CIs from the ' num2str(nboot) ' HA regress coeff resamples took ' num2str(tc_boot_ci) ' sec.'])
 
 
-% check the computated bootstrap statistics (estimators) and CI on graphics
-% ex2b_generate_param_resample_fig.m
+% % >> check the computated bootstrap statistics (estimators) and CI on graphics
+% ex2b_generate_param_resample_fig
