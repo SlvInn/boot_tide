@@ -35,11 +35,10 @@ data/*.mat
 # SPECIFIC
 .DS_Store*
 .maybe.tmp.old.
-
+.boot_UTide.
 
 # data
 data
-#wl_default_resamples_100b.mat
 *_resamples.mat
 
 

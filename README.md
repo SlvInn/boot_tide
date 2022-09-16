@@ -13,10 +13,15 @@ The project uses (adapted versions) of contributed MATLAB functions, including:
 - `fttnoise.m` by Aslak Grinsted ([2009](https://www.mathworks.com/matlabcentral/fileexchange/32111-fftnoise-generate-noise-with-a-specified-power-spectrum)), and 
 - `CircStat` by Berens ([2009](https://www.jstatsoft.org/article/view/v031i10))
 
----- 
-silvia.innocenti@ec.gc.ca
+## Cite as:
+Innocenti, Silvia 2022: boot_tide: residual bootstrap methods for parameter uncertainty assessment in tidal analysis with temporally correlated noise. https://doi.org/10.5281/zenodo.7085587.
 
+---- 
 Innocenti, S. and Matte, P. and Fortin, V. and Bernier, N. B., (2022), Residual bootstrap methods for parameter uncertainty assessment in tidal analysis with temporally correlated noise, JTECH, [DOI:10.1175/JTECH-D-21-0060.1](https://journals.ametsoc.org/view/journals/atot/aop/JTECH-D-21-0060.1/JTECH-D-21-0060.1.xml)
+
+
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
 
 # Contents
 1. [boot_tide.m:](#boot_tide.m) construct the residual bootstrap resamples/replicates.  
