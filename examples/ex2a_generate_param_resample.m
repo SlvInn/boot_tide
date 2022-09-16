@@ -1,8 +1,8 @@
-% ex2_generate_param_resample.m
+% ex2a_generate_param_resample.m
 % 
-% Test the boot_tide.m fonction for generating resamples of the model 
+% Use boot_tide.m for generating resamples of the model 
 % parameters using the MBB. Then compute the parameter bootstrap (plug-in) 
-% estimates and CI.
+% estimates and CIs with boot_tide_param.m.
 %
 % silvia.innocenti@ec.gc.ca, 2022/08/30. 
 clc; clear

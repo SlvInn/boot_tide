@@ -4,6 +4,6 @@
 3. `ex3a_compare_boot_ci.m`: compute and compare the bootstrap estimators and CIs of the tidal HA amplitudes and phases using the percentile, gaussian, and studentized bootstrap methods. 
 
 
-* `auxf`: folder with auxiliary funtions used to load data and greate figures
-* `load_one_station.m` and `load_two_stations.m`: load data (hourly water levelas and the results of HA regressions applied on these series)
+* `auxf`: folder with auxiliary functions used to load data and create figures
+* `load_one_station.m` and `load_two_stations.m`: load data (hourly water levels and the results of HA regressions applied on these series)
 

@@ -1,7 +1,7 @@
 % ex2b_generate_param_resample_fig.m 
 %
-% Compute the tidal amplitude and phase boot estimators and CI
-% and plot them on a graphic.
+% Compute the tidal amplitude and phase boot estimators and CIs
+% and visualize them on a graphic.
 %
 % silvia.innocenti@ec.gc.ca, 2022/09/14. 
 clc; clear
