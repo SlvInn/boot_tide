@@ -18,7 +18,7 @@ function out = get_mbb(data,opt)
     t    = data.t(data.valid);
     lt   = numel(data.t);
     yres = data.yres(data.valid,:);
-    ns = size(yres,2);
+    ns   = size(yres,2);
 
     % n of resamples
     nb = opt.nboot; 
@@ -146,7 +146,7 @@ end
 
 
 function out = from_mbb_res_to_out(data,ib,opt) 
-% TODO: check if this funtion works with varous locations because the tidal model shoudl be the same at all locations
+% TODO: check if this function works with varous locations because the tidal model shoudl be the same at all locations
 
     % reconstruction and resampled residuals
     y  = data.yhat;
