@@ -29,11 +29,19 @@ function out = boot_tide(time,y,varargin)
 %           to construct the residual resamples. Accepted strings are:
 %          'mbb' for implementing the Moving Block Boostrap (either with fixed or random block length')
 %          'spb' for the Semi-Parametric Bootstrap based on the residual power spectrum.
+%          '' for constructing resamples using the time vector indices provided in iboot (see below)
 %           Default: 'mbb'.
 %
 %           !! NOTE !! 'MBB' try to preserve the spatial consistency of the residuals at S locations,
 %                   while 'SPB' ignores any spatial dependence. Also, when considering S locations
 %                   with 'SPB', missing values in one series entail missing values at all other locations.
+%
+% 'iboot', tindices - T x n_boot matrix of integers in [1,T] to be used as indices of the time vector to construct  
+%           the resamples when method=''. This option may be usefull to apply spatial boostrap when 
+%           providing one station at time due to computational reasons (too long series).
+%           Default: []                  
+%
+%           !! NOTE !! Cannot provide iboot for 'mbb' and 'spb' methods.           
 %
 % 'circular', true/false  - boolean flag determining if a circular strategy 
 %           [Politis and Romano (1994)] must be used in constructing the resamples.

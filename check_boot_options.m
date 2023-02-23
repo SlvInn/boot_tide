@@ -18,7 +18,7 @@ function opt = check_boot_options(data,opt)
     
     % bootstrap method: Moving Block Bootstrap (MBB) or Semi-Parametric Bootstrap (SPB)
     opt.method = lower(opt.method);
-    assert(any(strcmp(opt.method,{'mbb' 'spb'})),'not valid bootstrap method')
+    assert(any(strcmp(opt.method,{'mbb','spb',''})),'not valid bootstrap method')
 
     
     if strcmp(opt.method,'mbb') % check options for the MBB
@@ -30,13 +30,17 @@ function opt = check_boot_options(data,opt)
         end
         
 
-    else % check options for SPB
-        opt = check_spb_opt(opt);  
+    elseif strcmp(opt.method,'spb') % check options for SPB
+        opt = check_spb_opt(opt); 
+        
+    else % check the iboot option and related ones
+        opt = check_knownit_opt(opt); 
+
     end    
 
     % check that tide_model is a function handle or empty
     if ~isempty((opt.tide_model))
-        assert(strcmp(class(opt.tide_model),'function_handle'),'tide_model must be a function handle')
+        assert(strcmpi(class(opt.tide_model),'function_handle'),'tide_model must be a function handle')
         assert(nargin(opt.tide_model)==1,'tide_model can only take 1 input argument (observation vector)')
         assert(~isempty((opt.theta)), 'theta must be provided for non empty tide_model')
         % opt.theta = opt.theta(:); %don't make theta being a col vector since we may have 2 stations
@@ -108,12 +112,14 @@ function opt = check_mbb_opt(data,opt)
         end
 
     end
-
-
-    % remove the SPB options
+    
+   
+    assert(isempty(opt.iboot),'cannot provide a vector of time indices to be resampled for method=mbb')
+    
+    % remove the SPB options and other unusefull opt
     opt = rmfield(opt,'noise');
     if ~strcmpi(opt.lblock_dist,'fix')
-        opt = rmfield(opt,'lblock'); 
+        opt = rmfield(opt,'lblock','iboot'); 
     end
 
 end
@@ -124,13 +130,39 @@ function opt = check_spb_opt(opt)
     legal_psd   = {'fft','fftnoise','skfft', 'sknoise', 'skewed','cpfft', 'cpnoise','dllftt', 'dllnoise', 'daniell'};
     legal_names = {'fft','fftnoise','skfft', 'sknoise', 'cpfft', 'cpnoise','dllftt', 'dllnoise'};
 
+    % check the name of the methods to simulate the residuals
     opt.noise = lower(opt.noise);
     assert(any(strcmp(opt.noise,legal_psd)), ['Not a valid noise value for SPD, possible methods are ' legal_names{:}])
     if ~any(strcmp(opt.noise,{'fft','fftnoise'}))
         warning([opt.noise ' SPB presently deprecated > use the ftt option instead'])
     end
 
-    % % remove the block info from opt
-    opt = rmfield(opt,{'lblock','lblock_par','lblock_dist','circular','block_output'});
+    % % remove MMB options (the block info)
+    assert(isempty(opt.iboot),'cannot provide a vector of time indices to be resampled for method=spb')
+    opt = rmfield(opt,{'lblock','lblock_par','lblock_dist','circular','block_output','iboot','iblocks'});
 
+end
+
+
+function opt = check_knownit_opt(opt)
+
+        % check that a vecrot of time indices is provided
+        assert(~isempty(opt.iboot),'a vector of time indices must be provided for empty method')
+        
+        % check the provided blocks and time indices
+        lt = length(data.t);
+        nb = opt.nboot;
+        [r,c] = size(opt.iboot);
+        assert(r==lt, ['iboot must be a ' num2str(lt) ' x ' num2str(nb) ' matrix. Provided is ' num2str(r) ' x ' num2str(c) '.'])
+        if c~=nb
+            warning(['Decrasing nboot to ' num2str(c) ' to match the provided ibott size'])
+        end
+        
+        assert(all(isinteger(opt.iboot(:))), 'iboot must be a matrix of integers (time vector indices)')
+        assert( all(opt.iboot(:)>1 & opt.iboot(:)<lt), [ 'iboot must contain indices in [1,' num2str(lt) ']' ])
+         
+        
+        % % remove MMB and SPB options 
+        opt = rmfield(opt,{'lblock','lblock_par','lblock_dist','block_output','iblocks'});
+        
 end

@@ -33,8 +33,8 @@ function out = get_mbb(data,opt)
     
 
     % empties
-    i_boot  = nan(lt,nb);  % index 
-    blocks = cell(nb,2);  % index of the start time and length of each block of each bootstrap resample
+    i_boot = nan(lt,nb);  % index 
+    blocks = cell(nb,2);   % index of the start time and length of each block of each bootstrap resample
     res = nan(nout,nb,ns); % empty matrix of y boot resamples or boot param
 
     % simulate the block lengths (if random blocks, otherwise repeat the fix length) and the random starts of the blocks:
@@ -79,7 +79,7 @@ function out = get_mbb(data,opt)
         i_boot(:,b) = itb(1:lt);
         blocks{b,1} = lblk(:);
         blocks{b,2} = rand_i0(1:blk,b);
-
+    
         % contruct the resamples of the water levels or residuals
         res(:,b,:) = from_mbb_res_to_out(data,i_boot(:,b),opt);
 

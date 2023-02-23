@@ -31,6 +31,8 @@ function defaults = set_default(function_name)
             
             defaults.tide_model = [];  % function handle for estimating the tidal parameters on each y resample 
             defaults.theta      = [];  % vector of parameter estimated on the observed sample [i.e., theta = tide_model(y)]
+            defaults.iboot      = [];  % lt x nboot matrix with temporal index to use to construct the resamples
+            
 
         case {'out','output'}
             
