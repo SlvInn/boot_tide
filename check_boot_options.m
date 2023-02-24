@@ -34,7 +34,7 @@ function opt = check_boot_options(data,opt)
         opt = check_spb_opt(opt); 
         
     else % check the iboot option and related ones
-        opt = check_knownit_opt(opt); 
+        opt = check_knownit_opt(data,opt); 
 
     end    
 
@@ -119,7 +119,7 @@ function opt = check_mbb_opt(data,opt)
     % remove the SPB options and other unusefull opt
     opt = rmfield(opt,'noise');
     if ~strcmpi(opt.lblock_dist,'fix')
-        opt = rmfield(opt,'lblock','iboot'); 
+        opt = rmfield(opt,{'lblock','iboot'}); 
     end
 
 end
@@ -144,7 +144,7 @@ function opt = check_spb_opt(opt)
 end
 
 
-function opt = check_knownit_opt(opt)
+function opt = check_knownit_opt(data,opt)
 
         % check that a vecrot of time indices is provided
         assert(~isempty(opt.iboot),'a vector of time indices must be provided for empty method')
@@ -158,11 +158,11 @@ function opt = check_knownit_opt(opt)
             warning(['Decrasing nboot to ' num2str(c) ' to match the provided ibott size'])
         end
         
-        assert(all(isinteger(opt.iboot(:))), 'iboot must be a matrix of integers (time vector indices)')
-        assert( all(opt.iboot(:)>1 & opt.iboot(:)<lt), [ 'iboot must contain indices in [1,' num2str(lt) ']' ])
+        assert(isequal(floor(opt.iboot),opt.iboot), 'iboot must be a matrix of integers (time vector indices)')
+        assert( all(opt.iboot(:)>=1 & opt.iboot(:)<=lt), [ 'iboot must contain indices in [1,' num2str(lt) ']' ])
          
         
-        % % remove MMB and SPB options 
-        opt = rmfield(opt,{'lblock','lblock_par','lblock_dist','block_output','iblocks'});
+        % % remove unusefull options 
+        opt = rmfield(opt,{'lblock','lblock_par','lblock_dist'});
         
 end

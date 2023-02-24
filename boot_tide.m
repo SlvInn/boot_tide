@@ -134,10 +134,10 @@ function out = boot_tide(time,y,varargin)
     out = set_options('output','options',boot_opt, 'yhat',data.yhat, 'yres',data.yres);
 
     % get the resamples (time indices and or simulated y)
-    if strcmp(boot_opt.method,'mbb')
-        out_boot = get_mbb(data,boot_opt);
-    else
+    if strcmp(boot_opt.method,'spb')
         out_boot = get_spb(data,boot_opt);
+    else
+        out_boot = get_mbb(data,boot_opt);
     end
 
 

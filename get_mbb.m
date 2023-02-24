@@ -1,6 +1,7 @@
 function out = get_mbb(data,opt)
 % Get the sequential indices to be used for constructing the y resamples
-% with the Moving Block Bootstrap (MBB) method.
+% with the Moving Block Bootstrap (MBB) method or get the resamples with
+% the known time indices (method='').
 %
 % INPUT:
 % data  - structure of processed data series   >> See help check_data
@@ -31,55 +32,67 @@ function out = get_mbb(data,opt)
         nout = lt;  
     end  
     
+    % empty matrix of y boot resamples or boot param
+    res = nan(nout,nb,ns); 
+     
+    if strcmpi(opt.method,'mbb')
+        % get the time vector indices to be used for constructing the y resamples
+        
+        % empties
+        i_boot = nan(lt,nb);  % index 
+        blocks = cell(nb,2);   % index of the start time and length of each block of each bootstrap resample
+       
+        % simulate the block lengths (if random blocks, otherwise repeat the fix length) and the random starts of the blocks:
+        [rand_l_blk, rand_i0, time_h] = mbb_block_lengths(t,data.tresol,opt);
 
-    % empties
-    i_boot = nan(lt,nb);  % index 
-    blocks = cell(nb,2);   % index of the start time and length of each block of each bootstrap resample
-    res = nan(nout,nb,ns); % empty matrix of y boot resamples or boot param
+        % double the time vector to allow for circular bootstrap
+        if opt.circular
+            tc = [t(:); t(:)];
+        else
+            tc = t(:);
+        end 
 
-    % simulate the block lengths (if random blocks, otherwise repeat the fix length) and the random starts of the blocks:
-    [rand_l_blk, rand_i0, time_h] = mbb_block_lengths(t,data.tresol,opt);
+        % construct the series of obs indices to select data in the resamples
+        for b = 1 : nb
 
-    % double the time vector to allow for circular bootstrap
-    if opt.circular
-        tc = [t(:); t(:)];
-    else
-        tc = t(:);
-    end 
-    
-    % construct the series of obs indices to select data in the resamples
-    for b = 1 : nb
+            % empties for the b-th resample
+            % tb  = []; % series  of resampled times/dates
+            itb   = []; % indices of the resampled times/dates
+            lblk  = []; % lengths of each block
+            blk   = 0 ; % block counter
 
-        % empties for the b-th resample
-        % tb  = []; % series  of resampled times/dates
-        itb   = []; % indices of the resampled times/dates
-        lblk  = []; % lengths of each block
-        blk   = 0 ; % block counter
+            while numel(itb) < lt
+               blk = blk+1; % increase the block counter
+                i0 = rand_i0(blk,b);     % random start of the blk-th block
+                l  = rand_l_blk(blk,b);  % length of the blk-th block
 
-        while numel(itb) < lt
-           blk = blk+1; % increase the block counter
-            i0 = rand_i0(blk,b);     % random start of the blk-th block
-            l  = rand_l_blk(blk,b);  % length of the blk-th block
-
-            tE = (time_h(i0)+l)/24;       % end time of the blk-th block [in days]
-            iE = find(tc<=tE,1,'last'); % index of the end time in the original series
-            iE = max([iE,i0]);  
+                tE = (time_h(i0)+l)/24;       % end time of the blk-th block [in days]
+                iE = find(tc<=tE,1,'last'); % index of the end time in the original series
+                iE = max([iE,i0]);  
 
 
-          % tb  = [tb; tc(i0:iE)];    % attach the block of dates to tb
-          lblk  = [lblk; numel(i0:iE)];  % record the length of the block  
-          itb   = [itb; [i0:iE]'];       % attach the block of indices to itb
+              % tb  = [tb; tc(i0:iE)];    % attach the block of dates to tb
+              lblk  = [lblk; numel(i0:iE)];  % record the length of the block  
+              itb   = [itb; [i0:iE]'];       % attach the block of indices to itb
 
+            end
+
+            % sub-stract the time length for indices of tc that exceede lt:
+            itb(itb>lt) = itb(itb>lt)-lt;
+
+            % eliminate exceeding indices and store the results in the output variables
+            i_boot(:,b) = itb(1:lt);
+            blocks{b,1} = lblk(:);
+            blocks{b,2} = rand_i0(1:blk,b);
         end
         
-        % sub-stract the time length for indices of tc that exceede lt:
-        itb(itb>lt) = itb(itb>lt)-lt;
-        
-        % eliminate exceeding indices and store the results in the output variables
-        i_boot(:,b) = itb(1:lt);
-        blocks{b,1} = lblk(:);
-        blocks{b,2} = rand_i0(1:blk,b);
+    else % if known time vector indices
+        i_boot = opt.iboot;
+        blocks = {};
+    end
     
+    for b = 1 : nb
+        
         % contruct the resamples of the water levels or residuals
         res(:,b,:) = from_mbb_res_to_out(data,i_boot(:,b),opt);
 
@@ -88,7 +101,7 @@ function out = get_mbb(data,opt)
 
     % add the block construction infor to the output structure, if requested
     if opt.block_output
-        out.i_boot = i_boot;
+        out.iboot  = i_boot;
         out.blocks = blocks;
     end    
 
